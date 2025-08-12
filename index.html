@@ -24,9 +24,11 @@
 
     <!-- Slide-out nav -->
     <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <!-- Close button -->
-      <button id="closeMenu" aria-label="Close menu" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;float:right;">✕</button>
-      <ul style="clear:both;">
+      <div class="drawer-head">
+        <span class="drawer-title">Menu</span>
+        <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+      </div>
+      <ul>
         <li><a href="#quote" class="nav-link">Get a Quote</a></li>
         <li><a href="#services" class="nav-link">Services</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
@@ -37,6 +39,9 @@
       </div>
     </nav>
   </header>
+
+  <!-- click-outside backdrop -->
+  <div id="backdrop" class="backdrop" hidden></div>
 
   <main id="top">
     <!-- HERO -->
@@ -123,23 +128,5 @@
   </footer>
 
   <script src="assets/script.js"></script>
-  <script>
-    // close menu functionality
-    const toggle = document.getElementById('menuToggle');
-    const drawer = document.getElementById('siteNav');
-    const closeBtn = document.getElementById('closeMenu');
-
-    toggle.addEventListener('click', () => {
-      const open = drawer.classList.toggle('open');
-      toggle.setAttribute('aria-expanded', String(open));
-      drawer.setAttribute('aria-hidden', String(!open));
-    });
-
-    closeBtn.addEventListener('click', () => {
-      drawer.classList.remove('open');
-      toggle.setAttribute('aria-expanded', 'false');
-      drawer.setAttribute('aria-hidden', 'true');
-    });
-  </script>
 </body>
 </html>
