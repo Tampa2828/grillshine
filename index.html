@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GrillShine — Professional Grill Cleaning</title>
+  <meta name="description" content="Professional grill cleaning, polishing, and safety inspections. Book your GrillShine quote today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="GrillShine Home">
+      <!-- Simple text logo for now; swap to SVG later -->
+      <span class="brand-mark">🔥</span> <span class="brand-text">GrillShine</span>
+    </a>
+
+    <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+
+    <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+      <ul>
+        <li><a href="#quote" class="nav-link">Get a Quote</a></li>
+        <li><a href="#services" class="nav-link">Services</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+      <div class="nav-cta">
+        <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123‑4567</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <h1>Make Your Grill Shine Again</h1>
+        <p class="sub">Professional grill cleaning & basic safety checks — fast, friendly, and hassle‑free.</p>
+        <div class="hero-cta">
+          <a href="#quote" class="btn btn-primary">Get a Quote</a>
+          <a href="tel:+1-555-123-4567" class="btn btn-ghost">Call (555) 123‑4567</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK SERVICES (placeholder copy) -->
+    <section id="services" class="section">
+      <h2>Services (Quick Overview)</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>Deep Clean</h3>
+          <p>Degrease, scrape, wipe‑down, and polish exterior surfaces for a refreshed look.</p>
+        </article>
+        <article class="card">
+          <h3>Basic Safety Check</h3>
+          <p>Visual inspection of burners, heat plates, and ignition. If you smell gas, call immediately.</p>
+        </article>
+        <article class="card">
+          <h3>Shine & Protect</h3>
+          <p>Light stainless polish to help resist fingerprints and restore sheen.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- QUOTE FORM -->
+    <section id="quote" class="section section-accent">
+      <h2>Get a Fast Quote</h2>
+      <p>No images needed yet — just send your details and we’ll text or email you back.</p>
+
+      <form id="quoteForm" class="quote-form" autocomplete="on" novalidate>
+        <div class="form-row">
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" placeholder="Your name" required />
+          <span class="error" data-for="name"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" placeholder="you@example.com" required />
+          <span class="error" data-for="email"></span>
+        </div>
+
+        <div class="form-row">
+          <label for="phone">Phone (optional)</label>
+          <input id="phone" name="phone" type="tel" placeholder="(555) 123‑4567" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Request Quote</button>
+        <p id="formMsg" role="status" class="form-msg" aria-live="polite"></p>
+      </form>
+
+      <div class="alt-contact">
+        Prefer to call or text? <a href="tel:+1-555-123-4567">Call (555) 123‑4567</a>
+      </div>
+    </section>
+
+    <!-- ABOUT (tiny) -->
+    <section id="about" class="section">
+      <h2>About GrillShine</h2>
+      <p>Local, insured, and focused on quality. We’ll keep this short until our full site launches with before/after photos and more details.</p>
+    </section>
+
+    <!-- CONTACT (tiny) -->
+    <section id="contact" class="section">
+      <h2>Contact</h2>
+      <ul class="contact-list">
+        <li><a href="tel:+1-555-123-4567">Call: (555) 123‑4567</a></li>
+        <li><a href="mailto:hello@grillshine.com">Email: hello@grillshine.com</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
+  </footer>
+
+  <script src="assets/script.js"></script>
+</body>
+</html>

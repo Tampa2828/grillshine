@@ -1,0 +1,99 @@
+:root{
+  --bg:#0f1115;
+  --card:#151924;
+  --accent:#ffd166;
+  --accent-ink:#2a2000;
+  --ink:#e6e9ef;
+  --muted:#b7beca;
+  --focus:#7cc4ff;
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:linear-gradient(180deg,#0d0f14 0%,#0f1115 100%);
+  color:var(--ink);
+}
+
+.site-header{
+  position:sticky; top:0; z-index:20;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; background:rgba(15,17,21,0.8); backdrop-filter: blur(6px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.brand{display:flex; align-items:center; gap:8px; text-decoration:none; color:var(--ink); font-weight:800; letter-spacing:.3px}
+.brand-mark{font-size:20px}
+.brand-text{font-size:18px}
+
+.hamburger{
+  width:42px;height:38px; background:transparent; border:1px solid rgba(255,255,255,0.12); border-radius:10px;
+  display:grid; place-items:center; cursor:pointer;
+}
+.hamburger .bar{display:block; width:20px; height:2px; background:var(--ink); margin:3px 0; border-radius:2px}
+
+.nav-drawer{
+  position:fixed; inset:0 0 0 auto; width:280px;
+  background:var(--card); box-shadow:var(--shadow);
+  transform:translateX(100%); transition:.28s ease; padding:20px;
+}
+.nav-drawer.open{ transform:translateX(0) }
+.nav-drawer ul{list-style:none; padding:0; margin:0}
+.nav-drawer li{margin:8px 0}
+.nav-drawer .nav-link{color:var(--ink); text-decoration:none; font-weight:600}
+.nav-drawer .nav-cta{margin-top:16px}
+
+.btn{
+  display:inline-block; padding:12px 16px; border-radius:10px; text-decoration:none; font-weight:700;
+  border:1px solid transparent;
+}
+.btn-primary{ background:var(--accent); color:var(--accent-ink) }
+.btn-outline{ border-color:rgba(255,255,255,0.2); color:var(--ink)}
+.btn-ghost{ border-color:rgba(255,255,255,0.12); color:var(--ink) }
+
+.hero{
+  padding:80px 18px 48px; text-align:center;
+  background:
+    radial-gradient(800px 300px at 50% -50%, rgba(255,209,102,.25), transparent 70%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+}
+.hero h1{font-size:40px; line-height:1.1; margin:0 0 12px}
+.hero .sub{color:var(--muted); margin:0 auto 16px; max-width:680px}
+.hero-cta{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:8px}
+
+.section{padding:56px 18px; max-width:1100px; margin:0 auto}
+.section h2{font-size:28px; margin:0 0 14px}
+.section-accent{ background:linear-gradient(180deg,rgba(255,209,102,0.06), transparent) }
+
+.cards{display:grid; gap:14px}
+.card{background:var(--card); padding:18px; border-radius:14px; border:1px solid rgba(255,255,255,0.06)}
+.card h3{margin:0 0 6px}
+
+.quote-form{
+  background:var(--card); border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px; padding:18px; max-width:560px;
+}
+.form-row{display:flex; flex-direction:column; gap:6px; margin-bottom:12px}
+input{
+  background:#0e121a; border:1px solid rgba(255,255,255,0.12);
+  border-radius:10px; padding:12px; color:var(--ink); outline:none;
+}
+input:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(124,196,255,.18)}
+.error{color:#ff8484; font-size:13px; min-height:16px}
+.form-msg{margin-top:10px; min-height:18px; color:var(--muted)}
+
+.alt-contact{margin-top:14px; color:var(--muted)}
+.contact-list{list-style:none; padding:0; margin:0}
+.contact-list a{color:var(--ink); text-decoration:none}
+
+.site-footer{
+  padding:28px 18px; text-align:center; color:var(--muted);
+  border-top:1px solid rgba(255,255,255,0.06); margin-top:40px;
+}
+
+/* larger screens */
+@media (min-width:720px){
+  .hero h1{font-size:56px}
+  .cards{grid-template-columns:repeat(3,1fr)}
+}
