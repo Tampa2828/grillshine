@@ -1,60 +1,60 @@
 // ==============================
-// GrillShine - Site Script
+// GrillShine — Site Script
 // ==============================
 
-// --- Year (guard in case element is missing)
+// Year (guard in case element is missing)
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-// --- Elements
+// Elements
 const toggle   = document.getElementById('menuToggle');
 const drawer   = document.getElementById('siteNav');
 const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
-// --- Motion preference
+// Motion preference
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// --- Helpers
+// Helpers
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
-  return header ? header.offsetHeight + 12 : 0; // add a little breathing room
+  return header ? header.offsetHeight + 12 : 0; // a little breathing room
 }
 function smoothScrollToEl(el) {
   const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
   window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
-// --- Focus management for the drawer (accessibility)
+// Focus management for the drawer (accessibility)
 let lastFocusedBeforeDrawer = null;
 function getFocusable(container) {
   if (!container) return [];
   return Array.from(
     container.querySelectorAll(
-      'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
     )
-  ).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+  ).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true');
 }
 function trapTabKey(e) {
-  if (!drawer?.classList.contains('open')) return;
+  if (!drawer || !drawer.classList.contains('open')) return;
+  if (e.key !== 'Tab') return;
+
   const focusables = getFocusable(drawer);
   if (focusables.length === 0) return;
 
   const first = focusables[0];
   const last  = focusables[focusables.length - 1];
 
-  if (e.key === 'Tab') {
-    if (e.shiftKey && document.activeElement === first) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault(); last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault(); first.focus();
   }
 }
 
-// --- Drawer open/close
+// Drawer open/close
+const originalBodyOverflow = document.body.style.overflow || '';
+
 function openDrawer() {
   if (!drawer) return;
   lastFocusedBeforeDrawer = document.activeElement;
@@ -68,11 +68,9 @@ function openDrawer() {
   drawer.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 
-  // Move focus into the drawer
   const first = getFocusable(drawer)[0];
   if (first) first.focus();
 
-  // Enable tab trapping
   document.addEventListener('keydown', trapTabKey);
 }
 
@@ -82,43 +80,41 @@ function closeDrawer() {
   drawer.classList.remove('open');
   if (backdrop) {
     backdrop.classList.remove('show');
-    // hide backdrop after transition
     setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
   }
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
   drawer.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = '';
+  document.body.style.overflow = originalBodyOverflow;
 
-  // Return focus to the toggle for accessibility
   if (lastFocusedBeforeDrawer && typeof lastFocusedBeforeDrawer.focus === 'function') {
     lastFocusedBeforeDrawer.focus();
   } else if (toggle) {
     toggle.focus();
   }
 
-  // Disable tab trapping
   document.removeEventListener('keydown', trapTabKey);
 }
 
-// --- Toggle button
+// Toggle button
 if (toggle) {
   toggle.addEventListener('click', () => {
-    if (drawer?.classList.contains('open')) { closeDrawer(); } else { openDrawer(); }
+    if (drawer?.classList.contains('open')) closeDrawer();
+    else openDrawer();
   });
 }
 
-// --- Close via ✕
+// Close via ✕
 if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
 
-// --- Close when clicking outside
+// Close when clicking outside
 if (backdrop) backdrop.addEventListener('click', closeDrawer);
 
-// --- Close on ESC
+// Close on ESC
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// --- Drawer links: close + smooth scroll with sticky-header offset
+// Drawer links: close + smooth scroll with sticky-header offset
 if (drawer) {
   drawer.querySelectorAll('a.nav-link[href^="#"]').forEach((a) => {
     a.addEventListener('click', (e) => {
@@ -127,17 +123,14 @@ if (drawer) {
       if (!target) return;
       e.preventDefault();
       closeDrawer();
-      // let the drawer start closing before scrolling
       setTimeout(() => smoothScrollToEl(target), 150);
     });
   });
 }
 
-// --- Global smooth scrolling for any in-page link not inside the drawer
+// Global smooth scrolling for any in-page link not inside the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  // Skip links managed by the drawer handler above
-  if (anchor.closest('#siteNav')) return;
-
+  if (anchor.closest('#siteNav')) return; // drawer links handled above
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
@@ -148,22 +141,20 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   });
 });
 
-// --- If page loads with a hash, adjust to account for sticky header
-function adjustForInitialHash() {
-  if (location.hash) {
-    const target = document.querySelector(location.hash);
-    if (target) {
-      // small delay to ensure layout is ready, then adjust
-      setTimeout(() => smoothScrollToEl(target), 50);
-    }
-  }
+// Handle initial hash & history changes (sticky header offset)
+function adjustForHash() {
+  if (!location.hash) return;
+  const target = document.querySelector(location.hash);
+  if (!target) return;
+  setTimeout(() => smoothScrollToEl(target), 50); // ensure layout is ready
 }
-window.addEventListener('load', adjustForInitialHash);
+window.addEventListener('load', adjustForHash);
+window.addEventListener('hashchange', adjustForHash);
 
-// --- If hash changes via back/forward, adjust too
-window.addEventListener('hashchange', adjustForInitialHash);
-
-// --- If resized (e.g., rotation), close drawer to avoid odd states
+// Close drawer on resize (debounced) to avoid odd states
+let resizeTimer = null;
 window.addEventListener('resize', () => {
-  if (drawer?.classList.contains('open')) closeDrawer();
+  if (!drawer?.classList.contains('open')) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(closeDrawer, 120);
 });

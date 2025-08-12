@@ -75,12 +75,26 @@
       .hero h1 { font-size: 44px; letter-spacing: .6px; }
       .hero .sub { font-size: 18px; }
     }
-    /* Brand logo image */
+    /* Brand logo image in header */
     .brand-logo {
       height: 28px;
       width: auto;
       vertical-align: middle;
       margin-right: 6px;
+    }
+    /* Hero overlay logo */
+    .hero-logo {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      transform: translateY(-50%);
+      z-index: 1;
+      max-width: 150px;
+    }
+    .hero-logo img {
+      width: 100%;
+      height: auto;
+      display: block;
     }
   </style>
 </head>
@@ -121,6 +135,11 @@
   <main id="top">
     <!-- HERO -->
     <section class="hero">
+      <!-- Logo overlay -->
+      <div class="hero-logo">
+        <img src="assets/img/skyline-logo.png" alt="Grill Shine Skyline Logo">
+      </div>
+
       <div class="hero-content">
         <h1>GRILL SHINE</h1>
         <p class="sub">Because Every Meal Deserves a Clean Start</p>
