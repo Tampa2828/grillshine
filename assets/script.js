@@ -12,6 +12,9 @@ const drawer   = document.getElementById('siteNav');
 const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
+// --- Motion preference
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 // --- Helpers
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
@@ -19,7 +22,7 @@ function headerOffsetPx() {
 }
 function smoothScrollToEl(el) {
   const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
-  window.scrollTo({ top: y, behavior: 'smooth' });
+  window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
 // --- Focus management for the drawer (accessibility)
@@ -146,7 +149,7 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 });
 
 // --- If page loads with a hash, adjust to account for sticky header
-window.addEventListener('load', () => {
+function adjustForInitialHash() {
   if (location.hash) {
     const target = document.querySelector(location.hash);
     if (target) {
@@ -154,4 +157,13 @@ window.addEventListener('load', () => {
       setTimeout(() => smoothScrollToEl(target), 50);
     }
   }
+}
+window.addEventListener('load', adjustForInitialHash);
+
+// --- If hash changes via back/forward, adjust too
+window.addEventListener('hashchange', adjustForInitialHash);
+
+// --- If resized (e.g., rotation), close drawer to avoid odd states
+window.addEventListener('resize', () => {
+  if (drawer?.classList.contains('open')) closeDrawer();
 });
