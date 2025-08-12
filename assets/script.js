@@ -1,3 +1,7 @@
+// ==============================
+// GrillShine - Site Script
+// ==============================
+
 // --- Year (guard in case element is missing)
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -18,9 +22,40 @@ function smoothScrollToEl(el) {
   window.scrollTo({ top: y, behavior: 'smooth' });
 }
 
+// --- Focus management for the drawer (accessibility)
+let lastFocusedBeforeDrawer = null;
+function getFocusable(container) {
+  if (!container) return [];
+  return Array.from(
+    container.querySelectorAll(
+      'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+  ).filter(el => !el.hasAttribute('disabled') && !el.getAttribute('aria-hidden'));
+}
+function trapTabKey(e) {
+  if (!drawer?.classList.contains('open')) return;
+  const focusables = getFocusable(drawer);
+  if (focusables.length === 0) return;
+
+  const first = focusables[0];
+  const last  = focusables[focusables.length - 1];
+
+  if (e.key === 'Tab') {
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+}
+
 // --- Drawer open/close
 function openDrawer() {
   if (!drawer) return;
+  lastFocusedBeforeDrawer = document.activeElement;
+
   drawer.classList.add('open');
   if (backdrop) {
     backdrop.hidden = false;
@@ -29,10 +64,18 @@ function openDrawer() {
   if (toggle) toggle.setAttribute('aria-expanded', 'true');
   drawer.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+
+  // Move focus into the drawer
+  const first = getFocusable(drawer)[0];
+  if (first) first.focus();
+
+  // Enable tab trapping
+  document.addEventListener('keydown', trapTabKey);
 }
 
 function closeDrawer() {
   if (!drawer) return;
+
   drawer.classList.remove('open');
   if (backdrop) {
     backdrop.classList.remove('show');
@@ -42,6 +85,16 @@ function closeDrawer() {
   if (toggle) toggle.setAttribute('aria-expanded', 'false');
   drawer.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
+
+  // Return focus to the toggle for accessibility
+  if (lastFocusedBeforeDrawer && typeof lastFocusedBeforeDrawer.focus === 'function') {
+    lastFocusedBeforeDrawer.focus();
+  } else if (toggle) {
+    toggle.focus();
+  }
+
+  // Disable tab trapping
+  document.removeEventListener('keydown', trapTabKey);
 }
 
 // --- Toggle button
@@ -79,7 +132,7 @@ if (drawer) {
 
 // --- Global smooth scrolling for any in-page link not inside the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  // Skip links that are managed by the drawer handler above
+  // Skip links managed by the drawer handler above
   if (anchor.closest('#siteNav')) return;
 
   anchor.addEventListener('click', (e) => {
