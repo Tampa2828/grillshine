@@ -12,17 +12,21 @@
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="#top" aria-label="GrillShine Home">
-      <!-- Simple text logo for now; swap to SVG later -->
-      <span class="brand-mark">🔥</span> <span class="brand-text">GrillShine</span>
-    </a>
-
+    <!-- Hamburger on the left -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
+    <!-- Brand on the right -->
+    <a class="brand" href="#top" aria-label="GrillShine Home">
+      <span class="brand-mark">🔥</span> <span class="brand-text">GrillShine</span>
+    </a>
+
+    <!-- Slide-out nav -->
     <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <ul>
+      <!-- Close button -->
+      <button id="closeMenu" aria-label="Close menu" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;float:right;">✕</button>
+      <ul style="clear:both;">
         <li><a href="#quote" class="nav-link">Get a Quote</a></li>
         <li><a href="#services" class="nav-link">Services</a></li>
         <li><a href="#about" class="nav-link">About</a></li>
@@ -119,5 +123,23 @@
   </footer>
 
   <script src="assets/script.js"></script>
+  <script>
+    // close menu functionality
+    const toggle = document.getElementById('menuToggle');
+    const drawer = document.getElementById('siteNav');
+    const closeBtn = document.getElementById('closeMenu');
+
+    toggle.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+      drawer.setAttribute('aria-hidden', String(!open));
+    });
+
+    closeBtn.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+      drawer.setAttribute('aria-hidden', 'true');
+    });
+  </script>
 </body>
 </html>
