@@ -66,15 +66,14 @@
       margin: 0 auto 16px;
       max-width: 680px;
     }
-    @media (min-width: 720px) {
-      .hero h1 { font-size: 72px; }
-    }
+    @media (min-width: 720px) { .hero h1 { font-size: 72px; } }
     @media (max-width: 520px) {
       .hero { min-height: 55vh; }
       .hero::before { background-position: 60% center; }
       .hero h1 { font-size: 44px; letter-spacing: .6px; }
       .hero .sub { font-size: 18px; }
     }
+
     /* Brand logo image in header */
     .brand-logo {
       height: 28px;
@@ -82,7 +81,8 @@
       vertical-align: middle;
       margin-right: 6px;
     }
-    /* Hero overlay logo */
+
+    /* Hero overlay logo (left-center over skyline) */
     .hero-logo {
       position: absolute;
       top: 50%;
@@ -90,12 +90,13 @@
       transform: translateY(-50%);
       z-index: 1;
       max-width: 150px;
+      pointer-events: none;              /* don’t block clicks */
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
     }
-    .hero-logo img {
-      width: 100%;
-      height: auto;
-      display: block;
-    }
+    .hero-logo img { width: 100%; height: auto; display: block; }
+
+    /* Hide overlay logo on small screens if it crowds the hero */
+    @media (max-width: 640px) { .hero-logo { display: none; } }
   </style>
 </head>
 <body>
@@ -137,7 +138,7 @@
     <section class="hero">
       <!-- Logo overlay -->
       <div class="hero-logo">
-        <img src="assets/img/skyline-logo.png" alt="Grill Shine Skyline Logo">
+        <img src="assets/img/sidelogo.png" alt="Grill Shine Skyline Logo">
       </div>
 
       <div class="hero-content">
