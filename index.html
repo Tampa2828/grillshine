@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
   <!-- External CSS (with cache-busting) -->
-  <link rel="stylesheet" href="assets/styles.css?v=5" />
+  <link rel="stylesheet" href="assets/styles.css?v=6" />
 
   <style>
     /* HERO background + typography */
@@ -82,7 +82,7 @@
       margin-right: 6px;
     }
 
-    /* Hero overlay logo */
+    /* Hero overlay logo (kept) */
     .hero-logo {
       position: absolute;
       top: 50%;
@@ -96,24 +96,14 @@
     .hero-logo img { width: 100%; height: auto; display: block; }
     @media (max-width: 640px) { .hero-logo { display: none; } }
 
-    /* Quote section background logo */
+    /* Quote section (no background logo) */
     #quote {
       position: relative;
-      background-color: #111; /* keep dark theme */
+      background-color: #111;
       overflow: hidden;
     }
-    #quote::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: url("assets/img/logo.png") center/contain no-repeat;
-      opacity: 0.55;
-      z-index: 0;
-    }
-    #quote > * {
-      position: relative;
-      z-index: 1; /* keeps text/forms above logo */
-    }
+    /* No ::before background image here */
+    #quote > * { position: relative; z-index: 1; }
   </style>
 </head>
 <body>
@@ -231,6 +221,6 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <script src="assets/script.js?v=5"></script>
+  <script src="assets/script.js?v=6"></script>
 </body>
 </html>
