@@ -79,7 +79,7 @@ body{
 .hero::before{
   content:"";
   position:absolute; inset:0;
-  background:url("assets/img/tampa-bay.jpg") center/cover no-repeat;
+  background:url("img/tampa-bay.jpg") center/cover no-repeat; /* fixed path */
   opacity:.55;                  /* 55% image opacity */
   z-index:0;
 }
