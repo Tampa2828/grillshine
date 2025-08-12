@@ -82,7 +82,7 @@
       margin-right: 6px;
     }
 
-    /* Hero overlay logo (left-center over skyline) */
+    /* Hero overlay logo */
     .hero-logo {
       position: absolute;
       top: 50%;
@@ -90,13 +90,30 @@
       transform: translateY(-50%);
       z-index: 1;
       max-width: 150px;
-      pointer-events: none;              /* don’t block clicks */
+      pointer-events: none;
       filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
     }
     .hero-logo img { width: 100%; height: auto; display: block; }
-
-    /* Hide overlay logo on small screens if it crowds the hero */
     @media (max-width: 640px) { .hero-logo { display: none; } }
+
+    /* Quote section background logo */
+    #quote {
+      position: relative;
+      background-color: #111; /* keep dark theme */
+      overflow: hidden;
+    }
+    #quote::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("assets/img/logo.png") center/contain no-repeat;
+      opacity: 0.55;
+      z-index: 0;
+    }
+    #quote > * {
+      position: relative;
+      z-index: 1; /* keeps text/forms above logo */
+    }
   </style>
 </head>
 <body>
@@ -130,17 +147,14 @@
     </nav>
   </header>
 
-  <!-- Backdrop -->
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main id="top">
     <!-- HERO -->
     <section class="hero">
-      <!-- Logo overlay -->
       <div class="hero-logo">
         <img src="assets/img/sidelogo.png" alt="Grill Shine Skyline Logo">
       </div>
-
       <div class="hero-content">
         <h1>GRILL SHINE</h1>
         <p class="sub">Because Every Meal Deserves a Clean Start</p>
@@ -217,7 +231,6 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- External JS (with cache-busting) -->
   <script src="assets/script.js?v=5"></script>
 </body>
 </html>

@@ -318,6 +318,17 @@ input:focus {
   margin-top: 40px;
 }
 
+/* QUOTE SECTION BACKGROUND LOGO */
+#quote-section {
+  position: relative;
+  background: url("assets/img/grillshine-bg.png") center/contain no-repeat;
+  background-color: transparent;
+  opacity: 0.55;
+  background-blend-mode: multiply;
+  padding: 50px 20px;
+  border-radius: 14px;
+}
+
 /* RESPONSIVE */
 @media (min-width: 720px) {
   .hero h1 {
