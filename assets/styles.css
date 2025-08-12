@@ -68,10 +68,11 @@ body{
 
 /* HERO with Tampa background */
 .hero{
-  position:relative;            /* allow overlays */
+  position:relative;
   overflow:hidden;
-  padding:80px 18px 48px; 
+  padding:80px 18px 48px;
   text-align:center;
+  min-height:420px; /* ensures background is visible */
   background:
     radial-gradient(800px 300px at 50% -50%, rgba(255,209,102,.25), transparent 70%),
     linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
@@ -79,17 +80,17 @@ body{
 .hero::before{
   content:"";
   position:absolute; inset:0;
-  background:url("img/tampa-bay.jpg") center/cover no-repeat; /* fixed path */
-  opacity:.55;                  /* 55% image opacity */
+  background:url("/assets/img/tampa-bay.jpg") center/cover no-repeat;
+  opacity:.55;
   z-index:0;
 }
 .hero::after{
   content:"";
   position:absolute; inset:0;
   background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.2) 40%, rgba(0,0,0,0));
-  z-index:0;                    /* subtle dark overlay for readability */
+  z-index:0;
 }
-.hero .hero-content{ position:relative; z-index:1 }  /* text above overlays */
+.hero .hero-content{ position:relative; z-index:1 }
 
 .hero h1{line-height:1.1; margin:0 0 12px}
 .hero .sub{color:var(--muted); margin:0 auto 16px; max-width:680px}
@@ -134,5 +135,6 @@ input:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(124,196,255,.18
   .cards{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:520px){
-  .hero::before{ background-position:60% center } /* keep skyline framed on phones */
+  .hero{ min-height:55vh; }
+  .hero::before{ background-position:60% center }
 }
