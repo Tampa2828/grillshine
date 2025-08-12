@@ -11,6 +11,11 @@
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
+
+/* Smooth scroll & sticky header offset */
+html { scroll-behavior: smooth; }
+.hero, .section { scroll-margin-top: 80px; }
+
 body{
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background:linear-gradient(180deg,#0d0f14 0%,#0f1115 100%);
@@ -92,8 +97,26 @@ body{
 }
 .hero .hero-content{ position:relative; z-index:1 }
 
-.hero h1{line-height:1.1; margin:0 0 12px}
-.hero .sub{color:var(--muted); margin:0 auto 16px; max-width:680px}
+/* PRO headline + subtitle */
+.hero h1{
+  font-family:'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight:800;
+  font-size:68px;
+  line-height:1.05;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#fff;
+  margin:0 0 10px;
+}
+.hero .sub{
+  font-family:'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-weight:500;
+  font-size:22px;
+  letter-spacing:.5px;
+  color:#fff;
+  margin:0 auto 16px;
+  max-width:680px;
+}
 .hero-cta{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:8px}
 
 /* Sections */
@@ -131,10 +154,12 @@ input:focus{border-color:var(--focus); box-shadow:0 0 0 3px rgba(124,196,255,.18
 
 /* Responsive tweaks */
 @media (min-width:720px){
-  .hero h1{font-size:64px}
+  .hero h1{font-size:72px}
   .cards{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:520px){
   .hero{ min-height:55vh; }
   .hero::before{ background-position:60% center }
+  .hero h1{ font-size:44px; letter-spacing:.6px; }
+  .hero .sub{ font-size:18px; }
 }
