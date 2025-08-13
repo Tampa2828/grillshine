@@ -16,7 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- External CSS (keep your file; cache-bust ok) -->
+  <!-- External CSS -->
   <link rel="stylesheet" href="assets/styles.css?v=6" />
 
   <style>
@@ -48,7 +48,7 @@
     }
     .hero .hero-content { position: relative; z-index: 1; }
 
-    /* Title styling — if you switched to "no stroke", your styles.css will win */
+    /* Gold gradient title (no stroke) */
     .hero h1{
       position: relative;
       font-family: 'Montserrat', Inter, system-ui, sans-serif;
@@ -64,7 +64,6 @@
               background-clip: text;
               color: transparent;
     }
-
     .hero .sub{
       font-family: 'Montserrat', Inter, system-ui, sans-serif;
       font-weight: 500;
@@ -85,9 +84,7 @@
     }
 
     /* Brand logo image in header */
-    .brand-logo{
-      height: 28px; width: auto; vertical-align: middle; margin-right: 6px;
-    }
+    .brand-logo{ height: 28px; width: auto; vertical-align: middle; margin-right: 6px; }
 
     /* Hero overlay logo (kept) */
     .hero-logo{
@@ -123,8 +120,10 @@
         <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
       </div>
       <ul>
+        <!-- keep in-page anchors first -->
         <li><a href="index.html#quote" class="nav-link">Get a Quote</a></li>
         <li><a href="index.html#services" class="nav-link">Services</a></li>
+        <!-- new standalone pages -->
         <li><a href="about.html" class="nav-link">About</a></li>
         <li><a href="before-after.html" class="nav-link">Before &amp; After</a></li>
         <li><a href="faq.html" class="nav-link">FAQ</a></li>
@@ -224,7 +223,26 @@
   <script>
     // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Ensure the drawer closes when a nav link is clicked (works for in-page and new pages)
+    (function () {
+      const drawer = document.getElementById('siteNav');
+      const backdrop = document.getElementById('backdrop');
+      const toggle = document.getElementById('menuToggle');
+      const closeBtn = document.getElementById('closeMenu');
+      const links = drawer.querySelectorAll('.nav-link');
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('show');
+        drawer.setAttribute('aria-hidden', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+
+      links.forEach(a => a.addEventListener('click', closeDrawer));
+      closeBtn && closeBtn.addEventListener('click', closeDrawer);
+      backdrop && backdrop.addEventListener('click', closeDrawer);
+    })();
   </script>
 </body>
 </html>
-
