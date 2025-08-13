@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Site Script (fixed nav behavior)
+// GrillShine — Site Script (nav fixed)
 // ==============================
 
 // Year (guard in case element is missing)
@@ -103,21 +103,18 @@ if (toggle) {
   });
 }
 
-// Close via ✕
+// Close via ✕ / backdrop / ESC
 if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-
-// Close when clicking outside
 if (backdrop) backdrop.addEventListener('click', closeDrawer);
-
-// Close on ESC
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
 /* ─────────────────────────────────────────────────────────────
    Drawer links:
-   - Smooth-scroll for same-page anchors (#id or index.html#id when on index)
-   - Otherwise allow normal navigation (about.html, before-after.html, faq.html)
+   - Smooth-scroll ONLY for same-page anchors:
+       "#id"  OR  "index.html#id" (while on the index page)
+   - Allow normal navigation for real pages (about.html, before-after.html, faq.html)
    - Always close the drawer after click
    ────────────────────────────────────────────────────────────*/
 function isOnIndex() {
@@ -127,7 +124,6 @@ function isOnIndex() {
 function isSamePageAnchor(href) {
   if (!href) return false;
   if (href.startsWith('#')) return true; // pure hash on any page
-  // index.html#section should be treated as same-page only if we're on index
   return isOnIndex() && /^index\.html#/.test(href);
 }
 function getHashSelector(href) {
@@ -137,26 +133,28 @@ function getHashSelector(href) {
   return m ? m[1] : null;
 }
 
+// IMPORTANT: only bind to HASH links inside the drawer
 if (drawer) {
-  drawer.querySelectorAll('a.nav-link').forEach((a) => {
+  drawer.querySelectorAll('a.nav-link[href^="#"], a.nav-link[href^="index.html#"]').forEach((a) => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href') || '';
-      if (isSamePageAnchor(href)) {
-        e.preventDefault();
-        closeDrawer();
-        const sel = getHashSelector(href);
-        const target = sel ? document.querySelector(sel) : null;
-        if (target) setTimeout(() => smoothScrollToEl(target), 150);
-      } else {
-        // Navigate normally to other pages; just close the drawer.
-        closeDrawer();
-        // no preventDefault here
-      }
+      if (!isSamePageAnchor(href)) return; // don't touch real pages
+      
+      e.preventDefault();
+      closeDrawer();
+      const sel = getHashSelector(href);
+      const target = sel ? document.querySelector(sel) : null;
+      if (target) setTimeout(() => smoothScrollToEl(target), 150);
     });
+  });
+
+  // For non-hash links in the drawer (real pages): just close, then let browser navigate
+  drawer.querySelectorAll('a.nav-link:not([href^="#"]):not([href^="index.html#"])').forEach((a) => {
+    a.addEventListener('click', () => closeDrawer());
   });
 }
 
-// Global smooth scrolling for any in-page link not inside the drawer
+// Global smooth scrolling for in-page links not inside the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   if (anchor.closest('#siteNav')) return; // drawer links handled above
   anchor.addEventListener('click', (e) => {
