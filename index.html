@@ -48,7 +48,7 @@
     }
     .hero .hero-content { position: relative; z-index: 1; }
 
-    /* GOLD gradient title with stroke behind it */
+    /* Title styling — if you switched to "no stroke", your styles.css will win */
     .hero h1{
       position: relative;
       font-family: 'Montserrat', Inter, system-ui, sans-serif;
@@ -58,27 +58,11 @@
       letter-spacing: 1px;
       text-transform: uppercase;
       margin: 0 0 10px;
-
-      /* gold gradient fill */
       background: linear-gradient(45deg, #FFD166, #E6B800);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
               background-clip: text;
               color: transparent;
-    }
-    /* Black stroke layer under the gradient text */
-    .hero h1::before{
-      content: attr(data-text);
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      -webkit-text-fill-color: #000; /* solid stroke color */
-      color: #000;
-      text-shadow:
-        -2px -2px 0 #000,
-         2px -2px 0 #000,
-        -2px  2px 0 #000,
-         2px  2px 0 #000;
     }
 
     .hero .sub{
@@ -89,7 +73,7 @@
       color: #fff;
       margin: 0 auto 16px;
       max-width: 680px;
-      text-shadow: 0 2px 6px rgba(0,0,0,.6); /* subtle readability boost */
+      text-shadow: 0 2px 6px rgba(0,0,0,.6);
     }
 
     @media (min-width: 720px){ .hero h1{ font-size: 72px } }
@@ -139,10 +123,12 @@
         <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
       </div>
       <ul>
-        <li><a href="#quote" class="nav-link">Get a Quote</a></li>
-        <li><a href="#services" class="nav-link">Services</a></li>
-        <li><a href="#about" class="nav-link">About</a></li>
-        <li><a href="#contact" class="nav-link">Contact</a></li>
+        <li><a href="index.html#quote" class="nav-link">Get a Quote</a></li>
+        <li><a href="index.html#services" class="nav-link">Services</a></li>
+        <li><a href="about.html" class="nav-link">About</a></li>
+        <li><a href="before-after.html" class="nav-link">Before &amp; After</a></li>
+        <li><a href="faq.html" class="nav-link">FAQ</a></li>
+        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
       </ul>
       <div class="nav-cta">
         <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
@@ -159,8 +145,7 @@
         <img src="assets/img/sidelogo.png" alt="Grill Shine Skyline Logo">
       </div>
       <div class="hero-content">
-        <!-- data-text powers the stroke layer -->
-        <h1 data-text="GRILL SHINE">GRILL SHINE</h1>
+        <h1>GRILL SHINE</h1>
         <p class="sub">Because Every Meal Deserves a Clean Start</p>
         <div class="hero-cta">
           <a href="#quote" class="btn btn-primary">Get a Quote</a>
@@ -242,3 +227,4 @@
   </script>
 </body>
 </html>
+
