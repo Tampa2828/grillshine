@@ -214,7 +214,6 @@
       const backdrop = document.getElementById('backdrop');
       const toggle = document.getElementById('menuToggle');
       const closeBtn = document.getElementById('closeMenu');
-      const links = drawer.querySelectorAll('.nav-link');
 
       function closeDrawer() {
         drawer.classList.remove('open');
@@ -223,15 +222,14 @@
         toggle.setAttribute('aria-expanded', 'false');
       }
 
-      links.forEach(a => {
-        a.addEventListener('click', (e) => {
-          e.preventDefault(); // stop instant close without nav
-          const target = a.getAttribute('href');
-          closeDrawer();
-          setTimeout(() => { window.location.href = target; }, 250);
-        });
-      });
+      function openDrawer() {
+        drawer.classList.add('open');
+        backdrop.classList.add('show');
+        drawer.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+      }
 
+      toggle.addEventListener('click', openDrawer);
       closeBtn && closeBtn.addEventListener('click', closeDrawer);
       backdrop && backdrop.addEventListener('click', closeDrawer);
     })();
