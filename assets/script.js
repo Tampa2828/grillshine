@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Site Script
+// GrillShine — Site Script (fixed nav behavior)
 // ==============================
 
 // Year (guard in case element is missing)
@@ -114,16 +114,44 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Drawer links: close + smooth scroll with sticky-header offset
+/* ─────────────────────────────────────────────────────────────
+   Drawer links:
+   - Smooth-scroll for same-page anchors (#id or index.html#id when on index)
+   - Otherwise allow normal navigation (about.html, before-after.html, faq.html)
+   - Always close the drawer after click
+   ────────────────────────────────────────────────────────────*/
+function isOnIndex() {
+  const path = location.pathname.replace(/\/+$/, '');
+  return path === '' || path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('index.html');
+}
+function isSamePageAnchor(href) {
+  if (!href) return false;
+  if (href.startsWith('#')) return true; // pure hash on any page
+  // index.html#section should be treated as same-page only if we're on index
+  return isOnIndex() && /^index\.html#/.test(href);
+}
+function getHashSelector(href) {
+  if (!href) return null;
+  if (href.startsWith('#')) return href;
+  const m = href.match(/^index\.html(#.+)$/);
+  return m ? m[1] : null;
+}
+
 if (drawer) {
-  drawer.querySelectorAll('a.nav-link[href^="#"]').forEach((a) => {
+  drawer.querySelectorAll('a.nav-link').forEach((a) => {
     a.addEventListener('click', (e) => {
-      const targetSel = a.getAttribute('href'); // e.g. "#services"
-      const target = targetSel ? document.querySelector(targetSel) : null;
-      if (!target) return;
-      e.preventDefault();
-      closeDrawer();
-      setTimeout(() => smoothScrollToEl(target), 150);
+      const href = a.getAttribute('href') || '';
+      if (isSamePageAnchor(href)) {
+        e.preventDefault();
+        closeDrawer();
+        const sel = getHashSelector(href);
+        const target = sel ? document.querySelector(sel) : null;
+        if (target) setTimeout(() => smoothScrollToEl(target), 150);
+      } else {
+        // Navigate normally to other pages; just close the drawer.
+        closeDrawer();
+        // no preventDefault here
+      }
     });
   });
 }
