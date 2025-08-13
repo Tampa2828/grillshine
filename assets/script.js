@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Site Script (nav fixed)
+// GrillShine — Site Script (final nav fix)
 // ==============================
 
 // Year (guard in case element is missing)
@@ -18,7 +18,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // Helpers
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
-  return header ? header.offsetHeight + 12 : 0; // a little breathing room
+  return header ? header.offsetHeight + 12 : 0; // breathing room
 }
 function smoothScrollToEl(el) {
   const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
@@ -112,10 +112,10 @@ document.addEventListener('keydown', (e) => {
 
 /* ─────────────────────────────────────────────────────────────
    Drawer links:
-   - Smooth-scroll ONLY for same-page anchors:
-       "#id"  OR  "index.html#id" (while on the index page)
-   - Allow normal navigation for real pages (about.html, before-after.html, faq.html)
-   - Always close the drawer after click
+   - If it's a same-page anchor (#id or index.html#id on the index), smooth-scroll.
+   - Otherwise, PREVENT DEFAULT, close the drawer, then navigate with location.href.
+   - This guarantees navigation even if the element disappears.
+   - Respect modifier keys / target="_blank" by not intercepting in those cases.
    ────────────────────────────────────────────────────────────*/
 function isOnIndex() {
   const path = location.pathname.replace(/\/+$/, '');
@@ -123,7 +123,7 @@ function isOnIndex() {
 }
 function isSamePageAnchor(href) {
   if (!href) return false;
-  if (href.startsWith('#')) return true; // pure hash on any page
+  if (href.startsWith('#')) return true;
   return isOnIndex() && /^index\.html#/.test(href);
 }
 function getHashSelector(href) {
@@ -132,25 +132,35 @@ function getHashSelector(href) {
   const m = href.match(/^index\.html(#.+)$/);
   return m ? m[1] : null;
 }
+function hasModifier(e) {
+  return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
+}
 
-// IMPORTANT: only bind to HASH links inside the drawer
 if (drawer) {
-  drawer.querySelectorAll('a.nav-link[href^="#"], a.nav-link[href^="index.html#"]').forEach((a) => {
+  drawer.querySelectorAll('a.nav-link').forEach((a) => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href') || '';
-      if (!isSamePageAnchor(href)) return; // don't touch real pages
-      
-      e.preventDefault();
-      closeDrawer();
-      const sel = getHashSelector(href);
-      const target = sel ? document.querySelector(sel) : null;
-      if (target) setTimeout(() => smoothScrollToEl(target), 150);
-    });
-  });
+      const targetBlank = a.getAttribute('target') === '_blank';
 
-  // For non-hash links in the drawer (real pages): just close, then let browser navigate
-  drawer.querySelectorAll('a.nav-link:not([href^="#"]):not([href^="index.html#"])').forEach((a) => {
-    a.addEventListener('click', () => closeDrawer());
+      if (hasModifier(e) || targetBlank) {
+        // Let browser handle new tab/window or modified clicks
+        closeDrawer();
+        return;
+      }
+
+      if (isSamePageAnchor(href)) {
+        e.preventDefault();
+        closeDrawer();
+        const sel = getHashSelector(href);
+        const target = sel ? document.querySelector(sel) : null;
+        if (target) setTimeout(() => smoothScrollToEl(target), 150);
+      } else {
+        // Real page navigation (about.html, before-after.html, faq.html)
+        e.preventDefault();
+        closeDrawer();
+        setTimeout(() => { window.location.href = href; }, 120);
+      }
+    });
   });
 }
 
@@ -172,12 +182,12 @@ function adjustForHash() {
   if (!location.hash) return;
   const target = document.querySelector(location.hash);
   if (!target) return;
-  setTimeout(() => smoothScrollToEl(target), 50); // ensure layout is ready
+  setTimeout(() => smoothScrollToEl(target), 50);
 }
 window.addEventListener('load', adjustForHash);
 window.addEventListener('hashchange', adjustForHash);
 
-// Close drawer on resize (debounced) to avoid odd states
+// Close drawer on resize (debounced)
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (!drawer?.classList.contains('open')) return;
