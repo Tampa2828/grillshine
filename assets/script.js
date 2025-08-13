@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Site Script (final nav fix, copy-paste ready)
+// GrillShine — Site Script (Menu closes only via X/backdrop/ESC)
 // ==============================
 
 // Year
@@ -110,32 +110,8 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Navigation for ALL drawer links
-function hasModifier(e) {
-  return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
-}
-if (drawer) {
-  drawer.querySelectorAll('a').forEach((a) => {
-    a.addEventListener('click', (e) => {
-      const href = a.getAttribute('href') || '';
-      const targetBlank = a.getAttribute('target') === '_blank';
-
-      if (!href) return;
-      if (hasModifier(e) || targetBlank) {
-        closeDrawer();
-        return; // Let browser handle new tab/window
-      }
-
-      e.preventDefault();
-      closeDrawer();
-      setTimeout(() => { window.location.href = href; }, 120);
-    });
-  });
-}
-
-// Global smooth scrolling for in-page links not inside the drawer
+// Smooth scrolling for in-page links
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  if (anchor.closest('#siteNav')) return; // drawer links handled above
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
@@ -146,7 +122,7 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   });
 });
 
-// Handle initial hash & history changes (sticky header offset)
+// Handle initial hash & history changes
 function adjustForHash() {
   if (!location.hash) return;
   const target = document.querySelector(location.hash);
