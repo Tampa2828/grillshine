@@ -76,6 +76,10 @@ body {
   display: grid;
   place-items: center;
   cursor: pointer;
+
+  /* ensure it sits above the backdrop if needed */
+  position: relative;
+  z-index: 1002;
 }
 .hamburger .bar {
   display: block;
@@ -96,7 +100,10 @@ body {
   transform: translateX(-100%);
   transition: .28s ease;
   padding: 20px;
-  z-index: 50;
+
+  /* keep the drawer ABOVE the backdrop */
+  z-index: 1001;
+
   border-right: 1px solid rgba(255,209,102,0.25);
 }
 .nav-drawer.open {
@@ -144,7 +151,10 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.45);
-  z-index: 45;
+
+  /* sits BELOW the drawer */
+  z-index: 1000;
+
   opacity: 0;
   pointer-events: none;
   transition: opacity .25s ease;
@@ -152,6 +162,10 @@ body {
 .backdrop.show {
   opacity: 1;
   pointer-events: auto;
+}
+/* ensure it's fully inert when hidden */
+.backdrop[hidden] {
+  display: none;
 }
 
 /* BUTTONS */

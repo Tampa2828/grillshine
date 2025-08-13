@@ -14,6 +14,14 @@ const backdrop = document.getElementById('backdrop');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// ==============================
+// Prevent clicks INSIDE the drawer from closing it
+// (If any old global "document click = close" exists, this stops the bubbling.)
+// ==============================
+drawer?.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
 // Sticky-header aware smooth scroll
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
@@ -88,7 +96,7 @@ closeBtn?.addEventListener('click', closeDrawer);
 backdrop?.addEventListener('click', closeDrawer);
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
 
-// Drawer link handling (THIS is the key fix)
+// Drawer link handling (key behavior)
 if (drawer) {
   drawer.addEventListener('click', (e) => {
     const a = e.target.closest('a');
