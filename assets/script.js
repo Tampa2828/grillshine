@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Menu closes ONLY via X/backdrop/ESC
+// GrillShine — Menu closes ONLY via X/backdrop/ESC, page links work
 // ==============================
 
 // Year
@@ -93,9 +93,29 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
 });
 
-// Smooth scrolling for in-page links (outside drawer only)
+// Handle links inside the drawer
+drawer.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', (e) => {
+    const href = link.getAttribute('href');
+
+    // If it's an in-page anchor (starts with #)
+    if (href && href.startsWith('#')) {
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        smoothScrollToEl(target);
+        closeDrawer();
+      }
+    } else {
+      // For normal page navigation — let the browser handle it
+      closeDrawer(); // Close menu before navigation
+    }
+  });
+});
+
+// Smooth scrolling for in-page links outside drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  if (anchor.closest('#siteNav')) return;
+  if (anchor.closest('#siteNav')) return; // skip drawer links (handled above)
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
