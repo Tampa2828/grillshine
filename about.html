@@ -4,20 +4,29 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>About — GrillShine</title>
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="assets/styles.css?v=6" />
 </head>
 <body>
   <header class="site-header">
+    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
+
+    <!-- Brand -->
     <a class="brand" href="index.html" aria-label="GrillShine Home">
       <img src="assets/img/logo.png" alt="Grill Shine Logo" class="brand-logo">
       <span class="brand-text">GrillShine</span>
     </a>
+
+    <!-- Nav Drawer -->
     <nav id="siteNav" class="nav-drawer" aria-hidden="true">
       <div class="drawer-head">
         <span class="drawer-title">Menu</span>
@@ -25,10 +34,11 @@
       </div>
       <ul>
         <li><a href="index.html#quote" class="nav-link">Get a Quote</a></li>
+        <li><a href="index.html#services" class="nav-link">Services</a></li>
         <li><a href="about.html" class="nav-link">About</a></li>
         <li><a href="before-after.html" class="nav-link">Before &amp; After</a></li>
         <li><a href="faq.html" class="nav-link">FAQ</a></li>
-        <li><a href="index.html" class="nav-link">← Back to Home</a></li>
+        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
       </ul>
       <div class="nav-cta">
         <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
@@ -49,6 +59,29 @@
   </footer>
 
   <script src="assets/script.js?v=9"></script>
-  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+  <script>
+    // Set current year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Ensure drawer closes when nav links are clicked
+    (function () {
+      const drawer = document.getElementById('siteNav');
+      const backdrop = document.getElementById('backdrop');
+      const toggle = document.getElementById('menuToggle');
+      const closeBtn = document.getElementById('closeMenu');
+      const links = drawer.querySelectorAll('.nav-link');
+
+      function closeDrawer() {
+        drawer.classList.remove('open');
+        backdrop.classList.remove('show');
+        drawer.setAttribute('aria-hidden', 'true');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+
+      links.forEach(a => a.addEventListener('click', closeDrawer));
+      closeBtn && closeBtn.addEventListener('click', closeDrawer);
+      backdrop && backdrop.addEventListener('click', closeDrawer);
+    })();
+  </script>
 </body>
 </html>
