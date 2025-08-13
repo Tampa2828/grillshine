@@ -110,12 +110,12 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Navigation for drawer links (always navigates)
+// Navigation for ALL drawer links
 function hasModifier(e) {
   return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
 }
 if (drawer) {
-  drawer.querySelectorAll('a.nav-link').forEach((a) => {
+  drawer.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href') || '';
       const targetBlank = a.getAttribute('target') === '_blank';
