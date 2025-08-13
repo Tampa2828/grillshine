@@ -16,11 +16,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- External CSS (with cache-busting) -->
+  <!-- External CSS (keep your file; cache-bust ok) -->
   <link rel="stylesheet" href="assets/styles.css?v=6" />
 
   <style>
-    /* HERO background + typography */
+    /* HERO background + typography (kept inline so it overrides cleanly) */
     .hero {
       position: relative;
       overflow: hidden;
@@ -47,17 +47,41 @@
       z-index: 0;
     }
     .hero .hero-content { position: relative; z-index: 1; }
-    .hero h1 {
+
+    /* GOLD gradient title with stroke behind it */
+    .hero h1{
+      position: relative;
       font-family: 'Montserrat', Inter, system-ui, sans-serif;
       font-weight: 800;
       font-size: 68px;
       line-height: 1.05;
       letter-spacing: 1px;
       text-transform: uppercase;
-      color: #fff;
       margin: 0 0 10px;
+
+      /* gold gradient fill */
+      background: linear-gradient(45deg, #FFD166, #E6B800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+              background-clip: text;
+              color: transparent;
     }
-    .hero .sub {
+    /* Black stroke layer under the gradient text */
+    .hero h1::before{
+      content: attr(data-text);
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      -webkit-text-fill-color: #000; /* solid stroke color */
+      color: #000;
+      text-shadow:
+        -2px -2px 0 #000,
+         2px -2px 0 #000,
+        -2px  2px 0 #000,
+         2px  2px 0 #000;
+    }
+
+    .hero .sub{
       font-family: 'Montserrat', Inter, system-ui, sans-serif;
       font-weight: 500;
       font-size: 22px;
@@ -65,45 +89,34 @@
       color: #fff;
       margin: 0 auto 16px;
       max-width: 680px;
+      text-shadow: 0 2px 6px rgba(0,0,0,.6); /* subtle readability boost */
     }
-    @media (min-width: 720px) { .hero h1 { font-size: 72px; } }
-    @media (max-width: 520px) {
-      .hero { min-height: 55vh; }
-      .hero::before { background-position: 60% center; }
-      .hero h1 { font-size: 44px; letter-spacing: .6px; }
-      .hero .sub { font-size: 18px; }
+
+    @media (min-width: 720px){ .hero h1{ font-size: 72px } }
+    @media (max-width: 520px){
+      .hero{ min-height: 55vh }
+      .hero::before{ background-position: 60% center }
+      .hero h1{ font-size: 44px; letter-spacing: .6px }
+      .hero .sub{ font-size: 18px }
     }
 
     /* Brand logo image in header */
-    .brand-logo {
-      height: 28px;
-      width: auto;
-      vertical-align: middle;
-      margin-right: 6px;
+    .brand-logo{
+      height: 28px; width: auto; vertical-align: middle; margin-right: 6px;
     }
 
     /* Hero overlay logo (kept) */
-    .hero-logo {
-      position: absolute;
-      top: 50%;
-      left: 10%;
-      transform: translateY(-50%);
-      z-index: 1;
-      max-width: 150px;
-      pointer-events: none;
+    .hero-logo{
+      position: absolute; top: 50%; left: 10%; transform: translateY(-50%);
+      z-index: 1; max-width: 150px; pointer-events: none;
       filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
     }
-    .hero-logo img { width: 100%; height: auto; display: block; }
-    @media (max-width: 640px) { .hero-logo { display: none; } }
+    .hero-logo img{ width: 100%; height: auto; display: block; }
+    @media (max-width: 640px){ .hero-logo{ display: none } }
 
     /* Quote section (no background logo) */
-    #quote {
-      position: relative;
-      background-color: #111;
-      overflow: hidden;
-    }
-    /* No ::before background image here */
-    #quote > * { position: relative; z-index: 1; }
+    #quote{ position: relative; background-color: #111; overflow: hidden; }
+    #quote > *{ position: relative; z-index: 1; }
   </style>
 </head>
 <body>
@@ -146,7 +159,8 @@
         <img src="assets/img/sidelogo.png" alt="Grill Shine Skyline Logo">
       </div>
       <div class="hero-content">
-        <h1>GRILL SHINE</h1>
+        <!-- data-text powers the stroke layer -->
+        <h1 data-text="GRILL SHINE">GRILL SHINE</h1>
         <p class="sub">Because Every Meal Deserves a Clean Start</p>
         <div class="hero-cta">
           <a href="#quote" class="btn btn-primary">Get a Quote</a>
@@ -168,7 +182,7 @@
           <p>Visual inspection of burners, heat plates, and ignition. If you smell gas, call immediately.</p>
         </article>
         <article class="card">
-          <h3>Shine & Protect</h3>
+          <h3>Shine &amp; Protect</h3>
           <p>Light stainless polish to help resist fingerprints and restore sheen.</p>
         </article>
       </div>
@@ -222,5 +236,9 @@
   </footer>
 
   <script src="assets/script.js?v=6"></script>
+  <script>
+    // Set current year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

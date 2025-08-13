@@ -140,6 +140,7 @@ body {
 }
 .hero .hero-content{ position: relative; z-index: 1 }
 .hero h1 {
+  position: relative;
   font-family: 'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-weight: 800;
   font-size: 68px;
@@ -150,8 +151,17 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0 0 10px;
-  
-  /* Black stroke effect */
+}
+
+/* Stroke layer behind */
+.hero h1::before {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  -webkit-text-fill-color: black;
+  -webkit-background-clip: border-box;
   text-shadow:
     -2px -2px 0 #000,
      2px -2px 0 #000,
