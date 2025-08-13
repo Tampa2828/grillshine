@@ -1,8 +1,8 @@
 // ==============================
-// GrillShine — Site Script (final nav fix)
+// GrillShine — Site Script (final nav fix, copy-paste ready)
 // ==============================
 
-// Year (guard in case element is missing)
+// Year
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -110,55 +110,25 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-/* ─────────────────────────────────────────────────────────────
-   Drawer links:
-   - If it's a same-page anchor (#id or index.html#id on the index), smooth-scroll.
-   - Otherwise, navigate normally (about.html, faq.html, etc.).
-   - Respect modifier keys / target="_blank".
-   ────────────────────────────────────────────────────────────*/
-function isOnIndex() {
-  const path = location.pathname.replace(/\/+$/, '');
-  return path === '' || path.endsWith('/') || path.endsWith('/index.html') || path.endsWith('index.html');
-}
-function isSamePageAnchor(href) {
-  if (!href) return false;
-  if (href.startsWith('#')) return true;
-  return isOnIndex() && /^index\.html#/.test(href);
-}
-function getHashSelector(href) {
-  if (!href) return null;
-  if (href.startsWith('#')) return href;
-  const m = href.match(/^index\.html(#.+)$/);
-  return m ? m[1] : null;
-}
+// Navigation for drawer links (always navigates)
 function hasModifier(e) {
   return e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
 }
-
 if (drawer) {
   drawer.querySelectorAll('a.nav-link').forEach((a) => {
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href') || '';
       const targetBlank = a.getAttribute('target') === '_blank';
 
+      if (!href) return;
       if (hasModifier(e) || targetBlank) {
-        // Let browser handle new tab/window or modified clicks
         closeDrawer();
-        return;
+        return; // Let browser handle new tab/window
       }
 
-      if (isSamePageAnchor(href)) {
-        e.preventDefault();
-        closeDrawer();
-        const sel = getHashSelector(href);
-        const target = sel ? document.querySelector(sel) : null;
-        if (target) setTimeout(() => smoothScrollToEl(target), 150);
-      } else {
-        // Real page navigation
-        closeDrawer();
-        // Allow animation to finish before navigating
-        setTimeout(() => { window.location.href = href; }, 120);
-      }
+      e.preventDefault();
+      closeDrawer();
+      setTimeout(() => { window.location.href = href; }, 120);
     });
   });
 }
