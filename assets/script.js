@@ -1,8 +1,8 @@
 // ==============================
-// GrillShine — Menu closes ONLY via X/backdrop/ESC, page links work
+// GrillShine — Drawer nav (links work, drawer closes only via X/backdrop/ESC)
 // ==============================
 
-// Year
+// Footer year
 const yearEl = document.getElementById('year');
 if (yearEl) yearEl.textContent = new Date().getFullYear();
 
@@ -12,10 +12,9 @@ const drawer   = document.getElementById('siteNav');
 const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
-// Motion preference
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Helpers
+// Sticky-header aware smooth scroll
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
   return header ? header.offsetHeight + 12 : 0;
@@ -25,39 +24,37 @@ function smoothScrollToEl(el) {
   window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
-// Focus trap
+// Focus trap helpers
 let lastFocusedBeforeDrawer = null;
 function getFocusable(container) {
   return container
-    ? Array.from(
-        container.querySelectorAll(
-          'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-        )
-      ).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
+    ? Array.from(container.querySelectorAll(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      )).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
     : [];
 }
 function trapTabKey(e) {
   if (!drawer?.classList.contains('open') || e.key !== 'Tab') return;
   const focusables = getFocusable(drawer);
-  if (focusables.length === 0) return;
+  if (!focusables.length) return;
   const first = focusables[0];
   const last  = focusables[focusables.length - 1];
-  if (e.shiftKey && document.activeElement === first) {
-    e.preventDefault(); last.focus();
-  } else if (!e.shiftKey && document.activeElement === last) {
-    e.preventDefault(); first.focus();
-  }
+  if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
 }
 
-// Drawer control
-const originalBodyOverflow = document.body.style.overflow || '';
+// Open / close
+const originalOverflow = document.body.style.overflow || '';
 
 function openDrawer() {
+  if (!drawer) return;
   lastFocusedBeforeDrawer = document.activeElement;
   drawer.classList.add('open');
-  backdrop.hidden = false;
-  requestAnimationFrame(() => backdrop.classList.add('show'));
-  toggle.setAttribute('aria-expanded', 'true');
+  if (backdrop) {
+    backdrop.hidden = false;
+    requestAnimationFrame(() => backdrop.classList.add('show'));
+  }
+  toggle?.setAttribute('aria-expanded', 'true');
   drawer.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
   const first = getFocusable(drawer)[0];
@@ -66,56 +63,76 @@ function openDrawer() {
 }
 
 function closeDrawer() {
+  if (!drawer) return;
   drawer.classList.remove('open');
-  backdrop.classList.remove('show');
-  setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-  toggle.setAttribute('aria-expanded', 'false');
+  if (backdrop) {
+    backdrop.classList.remove('show');
+    setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
+  }
+  toggle?.setAttribute('aria-expanded', 'false');
   drawer.setAttribute('aria-hidden', 'true');
-  document.body.style.overflow = originalBodyOverflow;
+  document.body.style.overflow = originalOverflow;
+
   if (lastFocusedBeforeDrawer && typeof lastFocusedBeforeDrawer.focus === 'function') {
     lastFocusedBeforeDrawer.focus();
   } else {
-    toggle.focus();
+    toggle?.focus();
   }
+
   document.removeEventListener('keydown', trapTabKey);
 }
 
-// Toggle button
-toggle.addEventListener('click', () => {
-  if (drawer.classList.contains('open')) closeDrawer();
-  else openDrawer();
-});
+// Toggle & close controls
+toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+closeBtn?.addEventListener('click', closeDrawer);
+backdrop?.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
 
-// Close via ✕ / backdrop / ESC
-closeBtn.addEventListener('click', closeDrawer);
-backdrop.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-});
+// Drawer link handling (THIS is the key fix)
+if (drawer) {
+  drawer.addEventListener('click', (e) => {
+    const a = e.target.closest('a');
+    if (!a || !drawer.contains(a)) return;
 
-// Handle links inside the drawer
-drawer.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', (e) => {
-    const href = link.getAttribute('href');
+    // Stop any bubbling that might close the drawer
+    e.stopPropagation();
 
-    // If it's an in-page anchor (starts with #)
-    if (href && href.startsWith('#')) {
-      const target = document.querySelector(href);
-      if (target) {
-        e.preventDefault();
-        smoothScrollToEl(target);
-        closeDrawer();
-      }
-    } else {
-      // For normal page navigation — let the browser handle it
-      closeDrawer(); // Close menu before navigation
+    const href = a.getAttribute('href') || '';
+    const targetBlank = a.getAttribute('target') === '_blank';
+    const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
+
+    if (!href || targetBlank || modified) {
+      // Let browser handle new tab / modified clicks
+      return;
     }
-  });
-});
 
-// Smooth scrolling for in-page links outside drawer
+    // Same-page anchors (e.g. #services or index.html#services)
+    const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
+    if (isSamePageHash) {
+      e.preventDefault();
+      const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
+      closeDrawer();
+      // Scroll after unlock
+      requestAnimationFrame(() => {
+        const el = document.querySelector(selector);
+        if (el) smoothScrollToEl(el);
+        else window.location.hash = selector; // fallback
+      });
+      return;
+    }
+
+    // Different page (about.html, faq.html, before-after.html, etc.)
+    e.preventDefault();
+    const url = href;
+    closeDrawer();
+    // Navigate after the drawer animation begins
+    setTimeout(() => { window.location.assign(url); }, 80);
+  });
+}
+
+// Smooth scrolling for in-page links OUTSIDE the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  if (anchor.closest('#siteNav')) return; // skip drawer links (handled above)
+  if (anchor.closest('#siteNav')) return; // drawer links are handled above
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
@@ -126,20 +143,20 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   });
 });
 
-// Handle initial hash & history changes
+// Respect sticky header on initial hash loads & hash changes
 function adjustForHash() {
   if (!location.hash) return;
-  const target = document.querySelector(location.hash);
-  if (!target) return;
-  setTimeout(() => smoothScrollToEl(target), 50);
+  const tgt = document.querySelector(location.hash);
+  if (!tgt) return;
+  setTimeout(() => smoothScrollToEl(tgt), 50);
 }
 window.addEventListener('load', adjustForHash);
 window.addEventListener('hashchange', adjustForHash);
 
-// Close drawer on resize
+// Close drawer on resize (safety)
 let resizeTimer = null;
 window.addEventListener('resize', () => {
-  if (!drawer.classList.contains('open')) return;
+  if (!drawer?.classList.contains('open')) return;
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(closeDrawer, 120);
 });
