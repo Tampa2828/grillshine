@@ -148,18 +148,12 @@ body {
   text-transform: uppercase;
   margin: 0 0 10px;
 
-  /* Gold gradient */
+  /* Gold gradient only */
   background: linear-gradient(45deg, #FFD166, #E6B800);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-
-  /* Thin black stroke for readability */
-  text-shadow:
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
 }
+
 .hero .sub{
   font-family: 'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-weight: 500; font-size: 22px; letter-spacing: .5px; color: var(--ink);
