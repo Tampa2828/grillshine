@@ -113,9 +113,8 @@ document.addEventListener('keydown', (e) => {
 /* ─────────────────────────────────────────────────────────────
    Drawer links:
    - If it's a same-page anchor (#id or index.html#id on the index), smooth-scroll.
-   - Otherwise, PREVENT DEFAULT, close the drawer, then navigate with location.href.
-   - This guarantees navigation even if the element disappears.
-   - Respect modifier keys / target="_blank" by not intercepting in those cases.
+   - Otherwise, navigate normally (about.html, faq.html, etc.).
+   - Respect modifier keys / target="_blank".
    ────────────────────────────────────────────────────────────*/
 function isOnIndex() {
   const path = location.pathname.replace(/\/+$/, '');
@@ -155,9 +154,9 @@ if (drawer) {
         const target = sel ? document.querySelector(sel) : null;
         if (target) setTimeout(() => smoothScrollToEl(target), 150);
       } else {
-        // Real page navigation (about.html, before-after.html, faq.html)
-        e.preventDefault();
+        // Real page navigation
         closeDrawer();
+        // Allow animation to finish before navigating
         setTimeout(() => { window.location.href = href; }, 120);
       }
     });
