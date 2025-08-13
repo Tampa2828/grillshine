@@ -142,7 +142,11 @@ body {
 .hero h1{
   font-family: 'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   font-weight: 800; font-size: 68px; line-height: 1.05; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+  text-transform: uppercase;
+  background: linear-gradient(45deg, #FFD166, #E6B800);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 10px;
 }
 .hero .sub{
   font-family: 'Montserrat', Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
