@@ -229,7 +229,10 @@
         toggle.setAttribute('aria-expanded', 'true');
       }
 
+      // Open menu
       toggle.addEventListener('click', openDrawer);
+
+      // Close only via X button or backdrop
       closeBtn && closeBtn.addEventListener('click', closeDrawer);
       backdrop && backdrop.addEventListener('click', closeDrawer);
     })();
