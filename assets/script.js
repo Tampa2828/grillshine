@@ -18,14 +18,14 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // Helpers
 function headerOffsetPx() {
   const header = document.querySelector('.site-header');
-  return header ? header.offsetHeight + 12 : 0; // breathing room
+  return header ? header.offsetHeight + 12 : 0;
 }
 function smoothScrollToEl(el) {
   const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
   window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
 }
 
-// Focus management for the drawer (accessibility)
+// Focus management for the drawer
 let lastFocusedBeforeDrawer = null;
 function getFocusable(container) {
   if (!container) return [];
