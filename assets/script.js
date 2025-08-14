@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Drawer nav (links work, drawer closes only via X/backdrop/ESC)
+// GrillShine — Drawer nav (stable open; closes only via X/backdrop/ESC; links work)
 // ==============================
 
 // Footer year
@@ -13,14 +13,6 @@ const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// ==============================
-// Prevent clicks INSIDE the drawer from closing it
-// (If any old global "document click = close" exists, this stops the bubbling.)
-// ==============================
-drawer?.addEventListener('click', (e) => {
-  e.stopPropagation();
-});
 
 // Sticky-header aware smooth scroll
 function headerOffsetPx() {
@@ -58,25 +50,33 @@ function openDrawer() {
   if (!drawer) return;
   lastFocusedBeforeDrawer = document.activeElement;
   drawer.classList.add('open');
+
   if (backdrop) {
     backdrop.hidden = false;
+    // ensure new frame so transition can run
     requestAnimationFrame(() => backdrop.classList.add('show'));
   }
+
   toggle?.setAttribute('aria-expanded', 'true');
   drawer.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+
   const first = getFocusable(drawer)[0];
   if (first) first.focus();
+
   document.addEventListener('keydown', trapTabKey);
 }
 
 function closeDrawer() {
   if (!drawer) return;
   drawer.classList.remove('open');
+
   if (backdrop) {
     backdrop.classList.remove('show');
+    // hide node after fade
     setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
   }
+
   toggle?.setAttribute('aria-expanded', 'false');
   drawer.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = originalOverflow;
@@ -91,28 +91,41 @@ function closeDrawer() {
 }
 
 // Toggle & close controls
-toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+toggle?.addEventListener('click', () => {
+  drawer?.classList.contains('open') ? closeDrawer() : openDrawer();
+});
 closeBtn?.addEventListener('click', closeDrawer);
-backdrop?.addEventListener('click', closeDrawer);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
 
-// Drawer link handling (key behavior)
+// IMPORTANT: use pointerdown on the BACKDROP only
+// (prevents weird bubbling when mousedown/up start/end on different elements)
+backdrop?.addEventListener('pointerdown', (e) => {
+  if (e.target === backdrop) closeDrawer();
+});
+
+// ESC closes
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
+});
+
+// Keep clicks inside the drawer from ever reaching the backdrop/document
+drawer?.addEventListener('click', (e) => e.stopPropagation());
+drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+// Drawer link handling (anchors + page nav)
 if (drawer) {
   drawer.addEventListener('click', (e) => {
     const a = e.target.closest('a');
     if (!a || !drawer.contains(a)) return;
 
-    // Stop any bubbling that might close the drawer
+    // we already stopped propagation above; this is just for safety
     e.stopPropagation();
 
     const href = a.getAttribute('href') || '';
     const targetBlank = a.getAttribute('target') === '_blank';
     const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
 
-    if (!href || targetBlank || modified) {
-      // Let browser handle new tab / modified clicks
-      return;
-    }
+    // New tab / modified click → let browser handle
+    if (!href || targetBlank || modified) return;
 
     // Same-page anchors (e.g. #services or index.html#services)
     const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
@@ -120,7 +133,7 @@ if (drawer) {
       e.preventDefault();
       const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
       closeDrawer();
-      // Scroll after unlock
+      // Scroll after the drawer starts closing
       requestAnimationFrame(() => {
         const el = document.querySelector(selector);
         if (el) smoothScrollToEl(el);
@@ -129,18 +142,18 @@ if (drawer) {
       return;
     }
 
-    // Different page (about.html, faq.html, before-after.html, etc.)
+    // Cross-page links
     e.preventDefault();
     const url = href;
     closeDrawer();
-    // Navigate after the drawer animation begins
-    setTimeout(() => { window.location.assign(url); }, 80);
+    // Let the close animation begin, then navigate
+    setTimeout(() => { window.location.assign(url); }, 100);
   });
 }
 
 // Smooth scrolling for in-page links OUTSIDE the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  if (anchor.closest('#siteNav')) return; // drawer links are handled above
+  if (anchor.closest('#siteNav')) return; // drawer links handled above
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
