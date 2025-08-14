@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — Drawer nav (stable open; closes only via X/backdrop/ESC; links work)
+// GrillShine — stable drawer (only X / ESC / backdrop close it)
 // ==============================
 
 // Footer year
@@ -13,6 +13,20 @@ const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// --- CAPTURE-PHASE SHIELD ---
+// If any legacy code is doing document.addEventListener('click', closeDrawer),
+// this prevents those handlers from seeing clicks that start inside the drawer.
+window.addEventListener('click', (e) => {
+  if (drawer?.classList.contains('open') && drawer.contains(e.target)) {
+    e.stopPropagation();
+    e.stopImmediatePropagation?.();
+  }
+}, true); // capture = true
+
+// Also stop bubbling inside the drawer for good measure
+drawer?.addEventListener('click', (e) => e.stopPropagation());
+drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // Sticky-header aware smooth scroll
 function headerOffsetPx() {
@@ -53,7 +67,6 @@ function openDrawer() {
 
   if (backdrop) {
     backdrop.hidden = false;
-    // ensure new frame so transition can run
     requestAnimationFrame(() => backdrop.classList.add('show'));
   }
 
@@ -73,7 +86,6 @@ function closeDrawer() {
 
   if (backdrop) {
     backdrop.classList.remove('show');
-    // hide node after fade
     setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
   }
 
@@ -91,13 +103,12 @@ function closeDrawer() {
 }
 
 // Toggle & close controls
-toggle?.addEventListener('click', () => {
-  drawer?.classList.contains('open') ? closeDrawer() : openDrawer();
-});
+toggle?.addEventListener('click', () =>
+  drawer?.classList.contains('open') ? closeDrawer() : openDrawer()
+);
 closeBtn?.addEventListener('click', closeDrawer);
 
-// IMPORTANT: use pointerdown on the BACKDROP only
-// (prevents weird bubbling when mousedown/up start/end on different elements)
+// Use pointerdown on the BACKDROP only (no “click anywhere”)
 backdrop?.addEventListener('pointerdown', (e) => {
   if (e.target === backdrop) closeDrawer();
 });
@@ -107,37 +118,28 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Keep clicks inside the drawer from ever reaching the backdrop/document
-drawer?.addEventListener('click', (e) => e.stopPropagation());
-drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
-
 // Drawer link handling (anchors + page nav)
 if (drawer) {
   drawer.addEventListener('click', (e) => {
     const a = e.target.closest('a');
     if (!a || !drawer.contains(a)) return;
 
-    // we already stopped propagation above; this is just for safety
-    e.stopPropagation();
-
     const href = a.getAttribute('href') || '';
     const targetBlank = a.getAttribute('target') === '_blank';
     const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
 
-    // New tab / modified click → let browser handle
     if (!href || targetBlank || modified) return;
 
-    // Same-page anchors (e.g. #services or index.html#services)
+    // Same-page anchors (e.g., #services or index.html#services)
     const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
     if (isSamePageHash) {
       e.preventDefault();
       const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
       closeDrawer();
-      // Scroll after the drawer starts closing
       requestAnimationFrame(() => {
         const el = document.querySelector(selector);
         if (el) smoothScrollToEl(el);
-        else window.location.hash = selector; // fallback
+        else window.location.hash = selector;
       });
       return;
     }
@@ -146,14 +148,13 @@ if (drawer) {
     e.preventDefault();
     const url = href;
     closeDrawer();
-    // Let the close animation begin, then navigate
     setTimeout(() => { window.location.assign(url); }, 100);
   });
 }
 
 // Smooth scrolling for in-page links OUTSIDE the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-  if (anchor.closest('#siteNav')) return; // drawer links handled above
+  if (anchor.closest('#siteNav')) return;
   anchor.addEventListener('click', (e) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
@@ -181,3 +182,4 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(closeDrawer, 120);
 });
+
