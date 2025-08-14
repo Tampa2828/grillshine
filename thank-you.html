@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Thanks — GrillShine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css?v=7" />
+  <style>
+    main{min-height:60vh;display:grid;place-items:center;padding:32px}
+    .card{max-width:560px;text-align:center}
+    .big{font-size:28px;font-weight:800;margin:0 0 8px;color:var(--accent)}
+    .sub{color:var(--muted);margin:0 0 16px}
+    .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GrillShine Home">
+      <span class="brand-logo"></span>
+      <span class="brand-text">GrillShine</span>
+    </a>
+  </header>
+
+  <main>
+    <div class="card">
+      <p class="big">Thanks! We got your request.</p>
+      <p class="sub">We’ll reach out soon with your quote.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="index.html#quote">Submit Another</a>
+        <a class="btn btn-outline" href="index.html">Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
+  </footer>
+
+  <script src="assets/script.js?v=10"></script>
+</body>
+</html>

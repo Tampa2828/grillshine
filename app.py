@@ -1,42 +1,44 @@
-import os, csv, io, sqlite3
+import os, csv, io
 from datetime import datetime
 from flask import Flask, request, redirect, url_for, session, send_file
-
-# SQLAlchemy to support both SQLite (local) and Postgres (production)
 from sqlalchemy import create_engine, text
 
 # --- Config ---
-# If DATABASE_URL is set (e.g., Render / Supabase Postgres), use it.
-# Else, fall back to a local SQLite file.
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///quotes.db")
-
-# For SQLite + SQLAlchemy 2.x, need this if using check_same_thread=False via URL param
-if DATABASE_URL.startswith("sqlite:///"):
-    # Use a file in the current folder; OK locally.
-    pass
-
 engine = create_engine(DATABASE_URL, future=True)
 
 ADMIN_USER = os.getenv("ADMIN_USER", "admin")
-ADMIN_PASS = os.getenv("ADMIN_PASS", "password123")  # or use ADMIN_PASS_HASH if you prefer later
+ADMIN_PASS = os.getenv("ADMIN_PASS", "password123")
 SECRET_KEY = os.getenv("SECRET_KEY", "devkey_change_me")
 
-# Flask app (serve your static site from the current directory)
 app = Flask(__name__, static_folder='.', static_url_path='')
 app.secret_key = SECRET_KEY
 
-# --- DB bootstrap (idempotent) ---
+# --- DB bootstrap (portable for SQLite/Postgres) ---
 def init_db():
+    backend = engine.url.get_backend_name()  # "sqlite", "postgresql", etc.
+    if backend == "sqlite":
+        ddl = """
+        CREATE TABLE IF NOT EXISTS quotes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT,
+            created_at TEXT NOT NULL
+        )
+        """
+    else:
+        ddl = """
+        CREATE TABLE IF NOT EXISTS quotes (
+            id SERIAL PRIMARY KEY,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            phone TEXT,
+            created_at TIMESTAMP NOT NULL
+        )
+        """
     with engine.begin() as conn:
-        conn.execute(text("""
-            CREATE TABLE IF NOT EXISTS quotes (
-                id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                phone TEXT,
-                created_at TEXT NOT NULL
-            )
-        """))
+        conn.execute(text(ddl))
 
 init_db()
 
@@ -57,6 +59,10 @@ def before_after():
 def faq():
     return app.send_static_file("faq.html")
 
+@app.get("/thank-you")
+def thank_you():
+    return app.send_static_file("thank-you.html")
+
 # --- Form handler ---
 @app.post("/quote")
 def quote():
@@ -65,19 +71,24 @@ def quote():
     phone = (request.form.get("phone") or "").strip()
 
     if not name or not email or "@" not in email:
-        # Redirect with error flag so the static page can show the message
+        # if invalid, send back to the form with an error indicator (optional)
         return redirect(url_for("home") + "#quote?err=1")
 
     with engine.begin() as conn:
         conn.execute(
             text("INSERT INTO quotes (name, email, phone, created_at) VALUES (:n,:e,:p,:c)"),
-            {"n": name, "e": email, "p": phone, "c": datetime.utcnow().isoformat(timespec="seconds")}
+            {
+                "n": name,
+                "e": email,
+                "p": phone,
+                "c": datetime.utcnow().isoformat(timespec="seconds")
+            }
         )
 
-    # Redirect back to the quote section with ok flag
-    return redirect(url_for("home") + "#quote?ok=1")
+    # Redirect to a real thank-you page
+    return redirect(url_for("thank_you"))
 
-# --- Admin auth (super simple) ---
+# --- Admin auth (simple) ---
 @app.route("/admin/login", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -122,7 +133,9 @@ def admin_dashboard():
     if not session.get("admin"):
         return redirect(url_for("admin_login"))
     with engine.begin() as conn:
-        rows = conn.execute(text("SELECT id, name, email, phone, created_at FROM quotes ORDER BY id DESC")).all()
+        rows = conn.execute(text(
+            "SELECT id, name, email, phone, created_at FROM quotes ORDER BY id DESC"
+        )).all()
     rows_html = ''.join(
         f"<tr><td>{r.id}</td><td>{r.name}</td><td>{r.email}</td><td>{r.phone or ''}</td><td>{r.created_at}</td>"
         f"<td><a href='{url_for('admin_delete', qid=r.id)}' onclick='return confirm(\"Delete?\")'>Delete</a></td></tr>"
@@ -173,5 +186,4 @@ def admin_export():
     return send_file(mem, mimetype="text/csv", as_attachment=True, download_name="quotes.csv")
 
 if __name__ == "__main__":
-    # Local run
     app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))

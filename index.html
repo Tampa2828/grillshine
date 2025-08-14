@@ -213,27 +213,6 @@
 
   <!-- Shared JS (drawer, smooth scroll, footer year) -->
   <script src="assets/script.js?v=10"></script>
-
-  <!-- Tiny status helper: shows a message after /quote redirect.
-       Works for both ?ok=1 in the query string OR #quote?ok=1 in the hash. -->
-  <script>
-    (function () {
-      const msg = document.getElementById('formMsg');
-      if (!msg) return;
-
-      // Try query string first; if empty, parse after the hash (e.g. #quote?ok=1)
-      const hash = location.hash || '';
-      const afterHashQs = hash.includes('?') ? hash.split('?')[1] : '';
-      const params = new URLSearchParams(location.search || afterHashQs);
-
-      if (params.get('ok') === '1') {
-        msg.textContent = 'Thanks! We got your request and will reply soon.';
-        msg.style.color = '#9BEF9B';
-      } else if (params.get('err') === '1') {
-        msg.textContent = 'Please provide a name and a valid email.';
-        msg.style.color = '#ff8484';
-      }
-    })();
-  </script>
 </body>
 </html>
+
