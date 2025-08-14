@@ -128,10 +128,8 @@
     backdrop.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer(); });
 
-    // Stop clicks inside drawer from closing it
     drawer.addEventListener('click', (e) => e.stopPropagation());
 
-    // Handle drawer links
     drawer.addEventListener('click', (e) => {
       const a = e.target.closest('a');
       if (!a) return;
@@ -154,7 +152,6 @@
       setTimeout(() => { window.location.assign(href); }, 80);
     });
 
-    // Smooth scroll for non-drawer in-page links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       if (anchor.closest('#siteNav')) return;
       anchor.addEventListener('click', (e) => {
@@ -172,7 +169,6 @@
     window.addEventListener('load', adjustForHash);
     window.addEventListener('hashchange', adjustForHash);
 
-    // Close on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
       if (!drawer.classList.contains('open')) return;

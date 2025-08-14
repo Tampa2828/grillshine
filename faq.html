@@ -14,38 +14,36 @@
   <link rel="stylesheet" href="assets/styles.css?v=7" />
 </head>
 <body>
+  <!-- Sticky header: hamburger + brand only -->
   <header class="site-header">
-    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand -->
-    <a class="brand" href="index.html" aria-label="GrillShine Home">
-      <img src="assets/img/logo.png" alt="Grill Shine Logo" class="brand-logo">
+    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+      <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
-
-    <!-- Nav Drawer -->
-    <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <div class="drawer-head">
-        <span class="drawer-title">Menu</span>
-        <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
-      </div>
-      <ul>
-        <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
-        <li><a href="index.html#services" class="nav-link">Services</a></li>
-        <li><a href="about.html"          class="nav-link">About</a></li>
-        <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
-        <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-        <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
-      </div>
-    </nav>
   </header>
 
+  <!-- Drawer and backdrop OUTSIDE header (crucial for z-index / click behavior) -->
+  <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="drawer-title">Menu</span>
+      <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+    </div>
+    <ul>
+      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="about.html"          class="nav-link">About</a></li>
+      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
+    </div>
+  </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main class="section">
@@ -59,7 +57,7 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Inline JS: Hamburger Menu -->
+  <!-- Inline JS: Drawer / Hamburger -->
   <script>
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -104,7 +102,7 @@
       drawer.classList.add('open');
       backdrop.hidden = false;
       requestAnimationFrame(() => backdrop.classList.add('show'));
-      toggle.setAttribute('aria-expanded', 'true');
+      toggle?.setAttribute('aria-expanded', 'true');
       drawer.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       const first = getFocusable(drawer)[0];
@@ -116,27 +114,28 @@
       drawer.classList.remove('open');
       backdrop.classList.remove('show');
       setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-      toggle.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-expanded', 'false');
       drawer.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = originalOverflow;
-      (lastFocusedBeforeDrawer || toggle).focus();
+      (lastFocusedBeforeDrawer || toggle)?.focus();
       document.removeEventListener('keydown', trapTabKey);
     }
 
-    toggle.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    closeBtn.addEventListener('click', closeDrawer);
-    backdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer(); });
+    toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+    closeBtn?.addEventListener('click', closeDrawer);
+    backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
 
-    // Stop clicks inside drawer from closing it
-    drawer.addEventListener('click', (e) => e.stopPropagation());
+    // Keep clicks inside the drawer from closing it
+    drawer?.addEventListener('click', (e) => e.stopPropagation());
 
-    // Handle drawer links
-    drawer.addEventListener('click', (e) => {
+    // Drawer link handling (hash + cross-page)
+    drawer?.addEventListener('click', (e) => {
       const a = e.target.closest('a');
       if (!a) return;
       const href = a.getAttribute('href') || '';
       if (!href) return;
+
       const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
       if (isSamePageHash) {
         e.preventDefault();
@@ -149,12 +148,13 @@
         });
         return;
       }
+
       e.preventDefault();
       closeDrawer();
       setTimeout(() => { window.location.assign(href); }, 80);
     });
 
-    // Smooth scroll for non-drawer in-page links
+    // Smooth scroll for non-drawer hash links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       if (anchor.closest('#siteNav')) return;
       anchor.addEventListener('click', (e) => {
@@ -172,13 +172,14 @@
     window.addEventListener('load', adjustForHash);
     window.addEventListener('hashchange', adjustForHash);
 
-    // Close on resize
+    // Safety: close on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
-      if (!drawer.classList.contains('open')) return;
+      if (!drawer?.classList.contains('open')) return;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(closeDrawer, 120);
     });
   </script>
 </body>
 </html>
+

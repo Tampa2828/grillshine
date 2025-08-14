@@ -18,40 +18,115 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="assets/styles.css?v=7" />
+
+  <style>
+    /* HERO background + typography */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 80px 18px 48px;
+      text-align: center;
+      min-height: 420px;
+      background:
+        radial-gradient(800px 300px at 50% -50%, rgba(255,209,102,.25), transparent 70%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("assets/img/tampa-bay.jpg") center/cover no-repeat;
+      opacity: .55;
+      z-index: 0;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.2) 40%, rgba(0,0,0,0));
+      z-index: 0;
+    }
+    .hero .hero-content { position: relative; z-index: 1; }
+
+    .hero h1{
+      position: relative;
+      font-family: 'Montserrat', Inter, system-ui, sans-serif;
+      font-weight: 800;
+      font-size: 68px;
+      line-height: 1.05;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 0 0 10px;
+      background: linear-gradient(45deg, #FFD166, #E6B800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+              background-clip: text;
+              color: transparent;
+    }
+    .hero .sub{
+      font-family: 'Montserrat', Inter, system-ui, sans-serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: .5px;
+      color: #fff;
+      margin: 0 auto 16px;
+      max-width: 680px;
+      text-shadow: 0 2px 6px rgba(0,0,0,.6);
+    }
+
+    @media (min-width: 720px){ .hero h1{ font-size: 72px } }
+    @media (max-width: 520px){
+      .hero{ min-height: 55vh }
+      .hero::before{ background-position: 60% center }
+      .hero h1{ font-size: 44px; letter-spacing: .6px }
+      .hero .sub{ font-size: 18px }
+    }
+
+    /* Only used on this page for the big side logo */
+    .hero-logo{
+      position: absolute; top: 50%; left: 10%; transform: translateY(-50%);
+      z-index: 1; max-width: 150px; pointer-events: none;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
+    }
+    .hero-logo img{ width: 100%; height: auto; display: block; }
+    @media (max-width: 640px){ .hero-logo{ display: none } }
+
+    #quote{ position: relative; background-color: #111; overflow: hidden; }
+    #quote > *{ position: relative; z-index: 1; }
+  </style>
 </head>
 <body>
+  <!-- Sticky header (brand + hamburger only) -->
   <header class="site-header">
-    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand -->
-    <a class="brand" href="#top" aria-label="GrillShine Home">
-      <img src="assets/img/logo.png" alt="Grill Shine Logo" class="brand-logo">
+    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+      <!-- Use SPAN; CSS provides background logo -->
+      <span class="brand-logo"></span>
       <span class="brand-text">GrillShine</span>
     </a>
-
-    <!-- Drawer -->
-    <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <div class="drawer-head">
-        <span class="drawer-title">Menu</span>
-        <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
-      </div>
-      <ul>
-        <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
-        <li><a href="index.html#services" class="nav-link">Services</a></li>
-        <li><a href="about.html"          class="nav-link">About</a></li>
-        <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
-        <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-        <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
-      </div>
-    </nav>
   </header>
 
+  <!-- Drawer and backdrop OUTSIDE the header (fixes z-index/closing issue) -->
+  <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="drawer-title">Menu</span>
+      <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+    </div>
+    <ul>
+      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="about.html"          class="nav-link">About</a></li>
+      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
+    </div>
+  </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main id="top">
@@ -136,7 +211,7 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Inline JS: Hamburger Menu -->
+  <!-- Inline JS: Drawer / Hamburger -->
   <script>
     const yearEl = document.getElementById('year');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -181,7 +256,7 @@
       drawer.classList.add('open');
       backdrop.hidden = false;
       requestAnimationFrame(() => backdrop.classList.add('show'));
-      toggle.setAttribute('aria-expanded', 'true');
+      toggle?.setAttribute('aria-expanded', 'true');
       drawer.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       const first = getFocusable(drawer)[0];
@@ -193,27 +268,28 @@
       drawer.classList.remove('open');
       backdrop.classList.remove('show');
       setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-      toggle.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-expanded', 'false');
       drawer.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = originalOverflow;
-      (lastFocusedBeforeDrawer || toggle).focus();
+      (lastFocusedBeforeDrawer || toggle)?.focus();
       document.removeEventListener('keydown', trapTabKey);
     }
 
-    toggle.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    closeBtn.addEventListener('click', closeDrawer);
-    backdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer(); });
+    toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+    closeBtn?.addEventListener('click', closeDrawer);
+    backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
 
-    // Stop clicks inside drawer from closing it
-    drawer.addEventListener('click', (e) => e.stopPropagation());
+    // Keep clicks inside the drawer from closing it
+    drawer?.addEventListener('click', (e) => e.stopPropagation());
 
-    // Handle drawer links
-    drawer.addEventListener('click', (e) => {
+    // Drawer link handling (hash + cross-page)
+    drawer?.addEventListener('click', (e) => {
       const a = e.target.closest('a');
       if (!a) return;
       const href = a.getAttribute('href') || '';
       if (!href) return;
+
       const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
       if (isSamePageHash) {
         e.preventDefault();
@@ -226,12 +302,13 @@
         });
         return;
       }
+
       e.preventDefault();
       closeDrawer();
       setTimeout(() => { window.location.assign(href); }, 80);
     });
 
-    // Smooth scroll for non-drawer in-page links
+    // Smooth scroll for non-drawer hash links
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       if (anchor.closest('#siteNav')) return;
       anchor.addEventListener('click', (e) => {
@@ -249,10 +326,10 @@
     window.addEventListener('load', adjustForHash);
     window.addEventListener('hashchange', adjustForHash);
 
-    // Close on resize
+    // Safety: close on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
-      if (!drawer.classList.contains('open')) return;
+      if (!drawer?.classList.contains('open')) return;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(closeDrawer, 120);
     });
