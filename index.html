@@ -82,7 +82,7 @@
       .hero .sub{ font-size: 18px }
     }
 
-    /* Only used on this page for the big side logo */
+    /* Side logo */
     .hero-logo{
       position: absolute; top: 50%; left: 10%; transform: translateY(-50%);
       z-index: 1; max-width: 150px; pointer-events: none;
@@ -96,20 +96,19 @@
   </style>
 </head>
 <body>
-  <!-- Sticky header (brand + hamburger only) -->
+  <!-- Sticky header -->
   <header class="site-header">
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
-      <!-- Use SPAN; CSS provides background logo -->
+    <a class="brand" href="#top" aria-label="GrillShine Home">
       <span class="brand-logo"></span>
       <span class="brand-text">GrillShine</span>
     </a>
   </header>
 
-  <!-- Drawer and backdrop OUTSIDE the header (fixes z-index/closing issue) -->
+  <!-- Drawer and backdrop -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -168,7 +167,8 @@
     <section id="quote" class="section section-accent">
       <h2>Get a Fast Quote</h2>
       <p>No images needed yet — just send your details and we’ll text or email you back.</p>
-      <form id="quoteForm" class="quote-form" autocomplete="on" novalidate>
+      <!-- IMPORTANT: this posts to Flask -->
+      <form id="quoteForm" class="quote-form" action="/quote" method="POST" autocomplete="on" novalidate>
         <div class="form-row">
           <label for="name">Name</label>
           <input id="name" name="name" type="text" placeholder="Your name" required />
@@ -211,128 +211,29 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Inline JS: Drawer / Hamburger -->
+  <!-- Shared JS (drawer, smooth scroll, footer year) -->
+  <script src="assets/script.js?v=10"></script>
+
+  <!-- Tiny status helper: shows a message after /quote redirect.
+       Works for both ?ok=1 in the query string OR #quote?ok=1 in the hash. -->
   <script>
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+    (function () {
+      const msg = document.getElementById('formMsg');
+      if (!msg) return;
 
-    const toggle   = document.getElementById('menuToggle');
-    const drawer   = document.getElementById('siteNav');
-    const closeBtn = document.getElementById('closeMenu');
-    const backdrop = document.getElementById('backdrop');
+      // Try query string first; if empty, parse after the hash (e.g. #quote?ok=1)
+      const hash = location.hash || '';
+      const afterHashQs = hash.includes('?') ? hash.split('?')[1] : '';
+      const params = new URLSearchParams(location.search || afterHashQs);
 
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function headerOffsetPx() {
-      const header = document.querySelector('.site-header');
-      return header ? header.offsetHeight + 12 : 0;
-    }
-    function smoothScrollToEl(el) {
-      const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
-      window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-    }
-
-    let lastFocusedBeforeDrawer = null;
-    function getFocusable(container) {
-      return container
-        ? Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'))
-          .filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
-        : [];
-    }
-    function trapTabKey(e) {
-      if (!drawer?.classList.contains('open') || e.key !== 'Tab') return;
-      const focusables = getFocusable(drawer);
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last  = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-
-    const originalOverflow = document.body.style.overflow || '';
-
-    function openDrawer() {
-      lastFocusedBeforeDrawer = document.activeElement;
-      drawer.classList.add('open');
-      backdrop.hidden = false;
-      requestAnimationFrame(() => backdrop.classList.add('show'));
-      toggle?.setAttribute('aria-expanded', 'true');
-      drawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      const first = getFocusable(drawer)[0];
-      if (first) first.focus();
-      document.addEventListener('keydown', trapTabKey);
-    }
-
-    function closeDrawer() {
-      drawer.classList.remove('open');
-      backdrop.classList.remove('show');
-      setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-      toggle?.setAttribute('aria-expanded', 'false');
-      drawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = originalOverflow;
-      (lastFocusedBeforeDrawer || toggle)?.focus();
-      document.removeEventListener('keydown', trapTabKey);
-    }
-
-    toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    closeBtn?.addEventListener('click', closeDrawer);
-    backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
-
-    // Keep clicks inside the drawer from closing it
-    drawer?.addEventListener('click', (e) => e.stopPropagation());
-
-    // Drawer link handling (hash + cross-page)
-    drawer?.addEventListener('click', (e) => {
-      const a = e.target.closest('a');
-      if (!a) return;
-      const href = a.getAttribute('href') || '';
-      if (!href) return;
-
-      const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
-      if (isSamePageHash) {
-        e.preventDefault();
-        const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
-        closeDrawer();
-        requestAnimationFrame(() => {
-          const el = document.querySelector(selector);
-          if (el) smoothScrollToEl(el);
-          else window.location.hash = selector;
-        });
-        return;
+      if (params.get('ok') === '1') {
+        msg.textContent = 'Thanks! We got your request and will reply soon.';
+        msg.style.color = '#9BEF9B';
+      } else if (params.get('err') === '1') {
+        msg.textContent = 'Please provide a name and a valid email.';
+        msg.style.color = '#ff8484';
       }
-
-      e.preventDefault();
-      closeDrawer();
-      setTimeout(() => { window.location.assign(href); }, 80);
-    });
-
-    // Smooth scroll for non-drawer hash links
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      if (anchor.closest('#siteNav')) return;
-      anchor.addEventListener('click', (e) => {
-        const hash = anchor.getAttribute('href');
-        const target = document.querySelector(hash);
-        if (target) { e.preventDefault(); smoothScrollToEl(target); }
-      });
-    });
-
-    function adjustForHash() {
-      if (!location.hash) return;
-      const tgt = document.querySelector(location.hash);
-      if (tgt) setTimeout(() => smoothScrollToEl(tgt), 50);
-    }
-    window.addEventListener('load', adjustForHash);
-    window.addEventListener('hashchange', adjustForHash);
-
-    // Safety: close on resize
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      if (!drawer?.classList.contains('open')) return;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(closeDrawer, 120);
-    });
+    })();
   </script>
 </body>
 </html>
