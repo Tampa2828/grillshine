@@ -76,8 +76,6 @@ body {
   display: grid;
   place-items: center;
   cursor: pointer;
-
-  /* ensure it sits above the backdrop if needed */
   position: relative;
   z-index: 1002;
 }
@@ -100,10 +98,7 @@ body {
   transform: translateX(-100%);
   transition: .28s ease;
   padding: 20px;
-
-  /* keep the drawer ABOVE the backdrop */
   z-index: 1001;
-
   border-right: 1px solid rgba(255,209,102,0.25);
 }
 .nav-drawer.open {
@@ -151,10 +146,7 @@ body {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.45);
-
-  /* sits BELOW the drawer */
   z-index: 1000;
-
   opacity: 0;
   pointer-events: none;
   transition: opacity .25s ease;
@@ -163,7 +155,6 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
-/* ensure it's fully inert when hidden */
 .backdrop[hidden] {
   display: none;
 }
@@ -291,32 +282,86 @@ body {
   color: var(--accent);
 }
 
-/* FORM */
+/* FORM – upgraded styling */
 .quote-form {
+  width: 100%;
+  max-width: 720px;
+  margin: 18px auto 8px;
+  padding: 20px 22px;
   background: var(--card);
   border: 1px solid rgba(255,209,102,0.25);
   border-radius: 14px;
-  padding: 18px;
-  max-width: 560px;
+  box-shadow: var(--shadow);
 }
 .form-row {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
-input {
-  background: #0e0e0e;
-  border: 1px solid rgba(255,209,102,0.25);
+.quote-form label {
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: .2px;
+}
+.quote-form input[type="text"],
+.quote-form input[type="email"],
+.quote-form input[type="tel"],
+.quote-form textarea {
+  width: 100%;
+  padding: 12px 14px;
   border-radius: 10px;
-  padding: 12px;
+  border: 1px solid rgba(255,209,102,.22);
+  background: #0f0f0f;
   color: var(--ink);
   outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
-input:focus {
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px rgba(214,40,40,.25);
+.quote-form textarea {
+  min-height: 110px;
+  resize: vertical;
 }
+.quote-form input::placeholder,
+.quote-form textarea::placeholder {
+  color: #a8a8a8;
+}
+.quote-form input:focus,
+.quote-form textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,209,102,.15);
+}
+
+/* File input */
+.quote-form input[type="file"] {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,209,102,.22);
+  background: #0f0f0f;
+  color: #cfcfcf;
+  cursor: pointer;
+}
+.quote-form .help {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Primary button */
+.quote-form .btn.btn-primary {
+  width: fit-content;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+  letter-spacing: .2px;
+  transition: transform .06s ease;
+}
+.quote-form .btn.btn-primary:active {
+  transform: translateY(1px);
+}
+
 .error {
   color: #ff8484;
   font-size: 13px;
@@ -380,5 +425,10 @@ input:focus {
   .brand-logo {
     width: 24px;
     height: 24px;
+  }
+  .quote-form {
+    padding: 16px;
+    margin-left: 8px;
+    margin-right: 8px;
   }
 }
