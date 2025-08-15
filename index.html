@@ -93,6 +93,7 @@
 
     #quote{ position: relative; background-color: #111; overflow: hidden; }
     #quote > *{ position: relative; z-index: 1; }
+    .help { color: var(--muted); font-size: 14px; margin-top: 6px; display: block; }
   </style>
 </head>
 <body>
@@ -166,26 +167,44 @@
     <!-- QUOTE -->
     <section id="quote" class="section section-accent">
       <h2>Get a Fast Quote</h2>
-      <p>No images needed yet — just send your details and we’ll text or email you back.</p>
-      <!-- IMPORTANT: this posts to Flask -->
-      <form id="quoteForm" class="quote-form" action="/quote" method="POST" autocomplete="on" novalidate>
+      <p>Send your details — and optionally add a short message and a few photos to speed things up.</p>
+
+      <!-- enctype needed for image uploads -->
+      <form id="quoteForm" class="quote-form" action="/quote" method="POST" enctype="multipart/form-data" autocomplete="on" novalidate>
         <div class="form-row">
           <label for="name">Name</label>
           <input id="name" name="name" type="text" placeholder="Your name" required />
           <span class="error" data-for="name"></span>
         </div>
+
         <div class="form-row">
           <label for="email">Email</label>
           <input id="email" name="email" type="email" placeholder="you@example.com" required />
           <span class="error" data-for="email"></span>
         </div>
+
         <div class="form-row">
           <label for="phone">Phone (optional)</label>
-          <input id="phone" name="phone" type="tel" placeholder="(555) 123-4567" />
+          <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="(555) 123-4567" />
         </div>
+
+        <!-- Details / message -->
+        <div class="form-row">
+          <label for="details">Additional Details (optional)</label>
+          <textarea id="details" name="details" rows="4" placeholder="Example: We have 2 grills (one flat top, one gas). Needs deep clean. Gate code 1234. Preferred mornings."></textarea>
+        </div>
+
+        <!-- Images -->
+        <div class="form-row">
+          <label for="images">Upload Photos (optional)</label>
+          <input id="images" name="images" type="file" accept="image/*" multiple aria-describedby="images-help" />
+          <small id="images-help" class="help">You can select multiple images. Clear, well-lit photos help us quote faster. Max total ~16MB.</small>
+        </div>
+
         <button type="submit" class="btn btn-primary">Request Quote</button>
         <p id="formMsg" role="status" class="form-msg" aria-live="polite"></p>
       </form>
+
       <div class="alt-contact">
         Prefer to call or text? <a href="tel:+1-555-123-4567">Call (555) 123-4567</a>
       </div>
@@ -215,4 +234,3 @@
   <script src="assets/script.js?v=10"></script>
 </body>
 </html>
-
