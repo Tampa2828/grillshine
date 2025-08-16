@@ -1,350 +1,166 @@
-import os, csv, io, smtplib, sys
-from datetime import datetime
-from email.message import EmailMessage
+# app.py
+import os, json, sqlite3, datetime as dt
+from pathlib import Path
+from flask import Flask, request, redirect, send_from_directory, jsonify, abort
 
-from flask import Flask, request, redirect, url_for, session, send_file, render_template
-from sqlalchemy import create_engine, text
-from werkzeug.utils import secure_filename
-from email_validator import validate_email, EmailNotValidError
-from dotenv import load_dotenv
+# ---------- paths ----------
+ROOT = Path(__file__).resolve().parent
+STATIC_DIR = ROOT  # serve project root (index.html, assets/, etc.)
+UPLOAD_DIR = ROOT / "static" / "uploads"
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+JSON_LOG = ROOT / "static" / "quotes.json"   # admin-quotes.html can fetch this
 
-# -------------------------------------------------
-# Env / Config
-# -------------------------------------------------
-load_dotenv()
+DB_PATH = ROOT / "quotes.db"
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///quotes.db")
-engine = create_engine(DATABASE_URL, future=True)
+# ---------- app ----------
+app = Flask(
+    __name__,
+    static_folder=str(STATIC_DIR),
+    static_url_path=""  # so /assets/... and root files are served
+)
 
-ADMIN_USER = os.getenv("ADMIN_USER", "admin")
-ADMIN_PASS = os.getenv("ADMIN_PASS", "password123")
-SECRET_KEY  = os.getenv("SECRET_KEY", "devkey_change_me")
+ALLOWED_EXTS = {"png", "jpg", "jpeg", "webp", "gif", "heic", "heif"}
+MAX_FILES = 8
 
-# SMTP (use your @grillshine.com host later; bypass enabled via DISABLE_SMTP)
-MAIL_SERVER   = os.getenv("MAIL_SERVER", "smtp.gmail.com")
-MAIL_PORT     = int(os.getenv("MAIL_PORT", "587"))
-MAIL_USE_TLS  = os.getenv("MAIL_USE_TLS", "true").lower() == "true"
-MAIL_USERNAME = os.getenv("MAIL_USERNAME")
-MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")
-MAIL_FROM     = os.getenv("MAIL_FROM", MAIL_USERNAME or "no-reply@localhost")
-ADMIN_EMAIL   = os.getenv("ADMIN_EMAIL")
-DISABLE_SMTP  = os.getenv("DISABLE_SMTP", "false").lower() == "true"  # <— BYPASS SWITCH
+def allowed(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[-1].lower() in ALLOWED_EXTS
 
-# Local uploads
-UPLOAD_DIR  = os.getenv("UPLOAD_DIR", "uploads")
-ALLOWED_EXTS = {"jpg","jpeg","png","gif","webp","heic","heif"}
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
-app = Flask(__name__, static_folder=".", static_url_path="")
-app.secret_key = SECRET_KEY
-app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16 MB
-
-def allowed_file(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTS
-
-# -------------------------------------------------
-# DB bootstrap (SQLite/Postgres)
-# -------------------------------------------------
+# ---------- db ----------
 def init_db():
-    backend = engine.url.get_backend_name()
-    if backend == "sqlite":
-        ddl = """
-        CREATE TABLE IF NOT EXISTS quotes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            phone TEXT,
-            details TEXT,
-            images TEXT,
-            created_at TEXT NOT NULL
-        )
-        """
-    else:
-        ddl = """
-        CREATE TABLE IF NOT EXISTS quotes (
-            id SERIAL PRIMARY KEY,
-            name TEXT NOT NULL,
-            email TEXT NOT NULL,
-            phone TEXT,
-            details TEXT,
-            images TEXT,
-            created_at TIMESTAMP NOT NULL
-        )
-        """
-    with engine.begin() as conn:
-        conn.execute(text(ddl))
-
+    with sqlite3.connect(DB_PATH) as con:
+        con.execute("""
+            CREATE TABLE IF NOT EXISTS quotes (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
+              email TEXT,
+              phone TEXT,
+              details TEXT,
+              files_json TEXT,
+              created_at TEXT
+            )
+        """)
 init_db()
 
-# -------------------------------------------------
-# Email helpers (dev-safe)
-# -------------------------------------------------
-def _dev_print(subject, to, html_body, text_body=None):
-    print("\n=== DEV EMAIL (SMTP DISABLED or CREDS MISSING) ===", file=sys.stderr)
-    print(f"TO: {to}", file=sys.stderr)
-    print(f"SUBJECT: {subject}", file=sys.stderr)
-    if text_body:
-        print(f"\nTEXT:\n{text_body}", file=sys.stderr)
-    print(f"\nHTML:\n{html_body}\n", file=sys.stderr)
-    print("=== END DEV EMAIL ===\n", file=sys.stderr)
+def insert_quote(name, email, phone, details, files):
+    with sqlite3.connect(DB_PATH) as con:
+        con.execute(
+            "INSERT INTO quotes (name, email, phone, details, files_json, created_at) VALUES (?,?,?,?,?,?)",
+            (name, email, phone, details, json.dumps(files), dt.datetime.utcnow().isoformat())
+        )
 
-def send_email(subject: str, to: str, html_body: str, text_body: str | None = None, reply_to: str | None = None):
-    """
-    Dev-safe sender.
-    If DISABLE_SMTP is true OR creds are missing, just print to console.
-    """
-    if DISABLE_SMTP or not (MAIL_USERNAME and MAIL_PASSWORD):
-        _dev_print(subject, to, html_body, text_body)
-        return
+def read_quotes(limit=500):
+    with sqlite3.connect(DB_PATH) as con:
+        con.row_factory = sqlite3.Row
+        rows = con.execute(
+            "SELECT id, name, email, phone, details, files_json, created_at FROM quotes ORDER BY id DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+    quotes = []
+    for r in rows:
+        files = []
+        try:
+            files = json.loads(r["files_json"]) if r["files_json"] else []
+        except Exception:
+            pass
+        quotes.append({
+            "id": r["id"],
+            "name": r["name"],
+            "email": r["email"],
+            "phone": r["phone"],
+            "details": r["details"],
+            "files": files,
+            "created_at": r["created_at"],
+        })
+    return quotes
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = MAIL_FROM
-    msg["To"] = to
-    if reply_to:
-        msg["Reply-To"] = reply_to
-    if text_body:
-        msg.set_content(text_body)
-    msg.add_alternative(html_body, subtype="html")
+# ---------- routes ----------
+@app.route("/")
+def root():
+    # Let static serve index.html from project root
+    return send_from_directory(STATIC_DIR, "index.html")
 
-    if MAIL_USE_TLS:
-        with smtplib.SMTP(MAIL_SERVER, MAIL_PORT) as s:
-            s.starttls()
-            s.login(MAIL_USERNAME, MAIL_PASSWORD)
-            s.send_message(msg)
-    else:
-        with smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT) as s:
-            s.login(MAIL_USERNAME, MAIL_PASSWORD)
-            s.send_message(msg)
-
-def notify_admin(subject: str, html_body: str, text_body: str | None = None):
-    if ADMIN_EMAIL:
-        send_email(subject, ADMIN_EMAIL, html_body, text_body)
-
-# -------------------------------------------------
-# Public pages (served as static files)
-# -------------------------------------------------
-@app.get("/")
-def home():
-    return app.send_static_file("index.html")
-
-@app.get("/about")
-def about():
-    return app.send_static_file("about.html")
-
-@app.get("/before-after")
-def before_after():
-    return app.send_static_file("before-after.html")
-
-@app.get("/faq")
-def faq():
-    return app.send_static_file("faq.html")
-
-@app.get("/thank-you")
-def thank_you():
-    return app.send_static_file("thank-you.html")
-
-# -------------------------------------------------
-# Form handler (save + email)
-# -------------------------------------------------
 @app.post("/quote")
 def quote():
-    name    = (request.form.get("name") or "").strip()
-    email   = (request.form.get("email") or "").strip()
-    phone   = (request.form.get("phone") or "").strip()
+    # fields
+    name = (request.form.get("name") or "").strip()
+    email = (request.form.get("email") or "").strip()
+    phone = (request.form.get("phone") or "").strip()
     details = (request.form.get("details") or "").strip()
 
-    # robust email validation + normalization
-    try:
-        email = validate_email(email).normalized
-    except EmailNotValidError:
-        return redirect(url_for("home") + "#quote?err=invalid_email")
+    # basic validation
+    if not name or not email:
+        # send them back to form; you could render a message instead
+        return redirect("/index.html#quote")
 
-    if not name:
-        return redirect(url_for("home") + "#quote?err=name")
+    # store uploaded images
+    saved_files = []
+    files = request.files.getlist("images")
+    if files:
+        files = files[:MAX_FILES]
+        date_folder = dt.datetime.utcnow().strftime("%Y-%m-%d")
+        folder = UPLOAD_DIR / date_folder
+        folder.mkdir(parents=True, exist_ok=True)
 
-    # Save images locally
-    image_urls = []
-    if "images" in request.files:
-        for f in request.files.getlist("images"):
+        for f in files:
             if not f or not f.filename:
                 continue
-            if not allowed_file(f.filename):
+            if not allowed(f.filename):
                 continue
-            filename = secure_filename(f.filename)
-            unique   = datetime.utcnow().strftime("%Y%m%d%H%M%S%f") + "_" + filename
-            save_path = os.path.join(UPLOAD_DIR, unique)
-            try:
-                f.save(save_path)
-                image_urls.append(f"/{UPLOAD_DIR}/{unique}")
-            except Exception as e:
-                print("Image save failed:", e)
+            ext = f.filename.rsplit(".", 1)[-1].lower()
+            stamp = dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S-%f")
+            safe_name = f"{stamp}.{ext}"
+            path = folder / safe_name
+            f.save(path)
+            # relative path so admin page can display
+            rel = f"/static/uploads/{date_folder}/{safe_name}"
+            saved_files.append(rel)
 
-    # DB insert
-    created = datetime.utcnow().isoformat(timespec="seconds")
-    with engine.begin() as conn:
-        conn.execute(text("""
-            INSERT INTO quotes (name, email, phone, details, images, created_at)
-            VALUES (:n,:e,:p,:d,:i,:c)
-        """), {"n": name, "e": email, "p": phone, "d": details, "i": ",".join(image_urls), "c": created})
+    # write to DB
+    insert_quote(name, email, phone, details, saved_files)
 
-    # Render email templates from templates/emails/*
-    cust_html = render_template("emails/customer_confirmation.html", name=name)
-    send_email(
-        subject="We received your Grill Shine quote request",
-        to=email,
-        html_body=cust_html,
-        text_body=f"Hi {name}, we received your Grill Shine quote request and will reach out shortly.\n— Grill Shine"
-    )
+    # also append to JSON log for admin-quotes.html
+    try:
+        JSON_LOG.parent.mkdir(parents=True, exist_ok=True)
+        existing = []
+        if JSON_LOG.exists():
+            existing = json.loads(JSON_LOG.read_text(encoding="utf-8"))
+        entry = {
+            "id": int(dt.datetime.utcnow().timestamp()),
+            "name": name, "email": email, "phone": phone,
+            "details": details, "files": saved_files,
+            "created_at": dt.datetime.utcnow().isoformat()
+        }
+        existing.insert(0, entry)  # newest first
+        JSON_LOG.write_text(json.dumps(existing[:1000], indent=2), encoding="utf-8")
+    except Exception as e:
+        print("Failed to update quotes.json:", e)
 
-    admin_html = render_template(
-        "emails/admin_new_quote.html",
-        name=name, email=email, phone=phone, message=details
-    )
-    notify_admin(
-        subject=f"[Grill Shine] New quote from {name}",
-        html_body=admin_html,
-        text_body=f"New quote:\nName: {name}\nEmail: {email}\nPhone: {phone}\n\nDetails:\n{details or '—'}"
-    )
+    # TODO: hook up real emails here if desired
+    # from email_utils import send_admin_email, send_customer_email
+    # send_admin_email(entry)
+    # send_customer_email(entry)
 
-    return redirect(url_for("thank_you"))
+    # redirect to thank-you page
+    return redirect("/thank-you.html")
 
-# -------------------------------------------------
-# Admin auth
-# -------------------------------------------------
-@app.route("/admin/login", methods=["GET", "POST"])
-def admin_login():
-    if request.method == "POST":
-        if request.form.get("username") == ADMIN_USER and request.form.get("password") == ADMIN_PASS:
-            session["admin"] = True
-            return redirect(url_for("admin_dashboard"))
-        return ('<p style="color:#ff8484;font-family:system-ui">Invalid credentials</p>' + LOGIN_FORM)
-    return LOGIN_FORM
+@app.get("/admin/quotes.json")
+def admin_quotes_json():
+    # simple JSON view from SQLite (no auth for now; you can add a token check)
+    return jsonify(read_quotes())
 
-LOGIN_FORM = """
-<!doctype html><meta charset="utf-8">
-<title>Admin Login</title>
-<style>
-body{font-family:Inter,system-ui,sans-serif;background:#0f0f0f;color:#fff;
-display:grid;place-items:center;height:100vh;margin:0}
-.card{background:#1a1a1a;border:1px solid rgba(255,209,102,.25);padding:20px;border-radius:12px;min-width:320px}
-label{display:block;margin:8px 0 4px}
-input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,209,102,.25);background:#0e0e0e;color:#fff}
-button{margin-top:12px;padding:10px 14px;border-radius:8px;border:1px solid #FFD166;background:#FFD166;color:#2a2000;font-weight:700;cursor:pointer}
-a{color:#FFD166;text-decoration:none}
-</style>
-<div class="card">
-  <h2 style="color:#FFD166;margin:0 0 8px">GrillShine — Admin</h2>
-  <form method="POST">
-    <label>Username</label><input name="username" autofocus>
-    <label>Password</label><input name="password" type="password">
-    <button type="submit">Login</button>
-  </form>
-</div>
-"""
+# Optional: clear JSON log (protect with env token)
+@app.post("/admin/clear-json")
+def clear_json():
+    token = request.args.get("token", "")
+    if token != os.environ.get("ADMIN_CLEAR_TOKEN", ""):
+        return abort(403)
+    JSON_LOG.write_text("[]", encoding="utf-8")
+    return jsonify({"ok": True})
 
-@app.get("/admin/logout")
-def admin_logout():
-    session.clear()
-    return redirect(url_for("admin_login"))
+# Serve thank-you explicitly if needed
+@app.get("/thank-you.html")
+def thankyou():
+    return send_from_directory(STATIC_DIR, "thank-you.html")
 
-# -------------------------------------------------
-# Admin dashboard
-# -------------------------------------------------
-@app.get("/admin")
-@app.get("/admin/dashboard")
-def admin_dashboard():
-    if not session.get("admin"):
-        return redirect(url_for("admin_login"))
-    with engine.begin() as conn:
-        rows = conn.execute(text(
-            "SELECT id, name, email, phone, details, images, created_at FROM quotes ORDER BY id DESC"
-        )).all()
-
-    rows_html = ""
-    for r in rows:
-        img_html = ""
-        if r.images:
-            for url in r.images.split(","):
-                url = (url or "").strip()
-                if url:
-                    img_html += (
-                        f"<a href='{url}' target='_blank'>"
-                        f"<img src='{url}' style='max-width:80px;max-height:80px;margin:2px;border-radius:6px;'></a>"
-                    )
-        rows_html += f"""
-        <tr>
-            <td>{r.id}</td>
-            <td>{r.name}</td>
-            <td>{r.email}</td>
-            <td>{r.phone or ''}</td>
-            <td style="max-width:320px;white-space:pre-wrap">{(r.details or '')}</td>
-            <td>{img_html}</td>
-            <td>{r.created_at}</td>
-            <td><a href='{url_for('admin_delete', qid=r.id)}' onclick='return confirm("Delete?")'>Delete</a></td>
-        </tr>
-        """
-
-    return f"""
-    <!doctype html><meta charset="utf-8">
-    <title>Admin — Quotes</title>
-    <style>
-      body{{font-family:Inter,system-ui,sans-serif;background:#0f0f0f;color:#fff;margin:0;padding:20px}}
-      a{{color:#FFD166;text-decoration:none}}
-      .top{{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}}
-      table{{width:100%;border-collapse:collapse;background:#1a1a1a;border:1px solid rgba(255,209,102,.25);border-radius:12px;overflow:hidden}}
-      th,td{{padding:10px;border-bottom:1px solid rgba(255,209,102,.15);vertical-align:top}} th{{color:#FFD166;text-align:left}}
-      .btn{{display:inline-block;padding:8px 12px;border:1px solid #FFD166;border-radius:8px}}
-      img{{display:block}}
-    </style>
-    <div class="top">
-      <h2 style="color:#FFD166;margin:0">Quote Requests</h2>
-      <div>
-        <a class="btn" href="{url_for('admin_export')}">Export CSV</a>
-        <a class="btn" href="{url_for('admin_logout')}">Logout</a>
-      </div>
-    </div>
-    <table>
-      <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Details</th><th>Images</th><th>Created</th><th>Actions</th></tr></thead>
-      <tbody>{rows_html or "<tr><td colspan=8 style='padding:16px'>No entries yet.</td></tr>"}</tbody>
-    </table>
-    """
-
-@app.get("/admin/delete/<int:qid>")
-def admin_delete(qid):
-    if not session.get("admin"):
-        return redirect(url_for("admin_login"))
-    with engine.begin() as conn:
-        conn.execute(text("DELETE FROM quotes WHERE id=:id"), {"id": qid})
-    return redirect(url_for("admin_dashboard"))
-
-@app.get("/admin/export")
-def admin_export():
-    if not session.get("admin"):
-        return redirect(url_for("admin_login"))
-    with engine.begin() as conn:
-        rows = conn.execute(text(
-            "SELECT id, name, email, phone, details, images, created_at FROM quotes ORDER BY id DESC"
-        )).all()
-    output = io.StringIO()
-    w = csv.writer(output)
-    w.writerow(["id","name","email","phone","details","images","created_at"])
-    for r in rows:
-        w.writerow([r.id, r.name, r.email, r.phone or "", r.details or "", r.images or "", r.created_at])
-    mem = io.BytesIO(output.getvalue().encode("utf-8"))
-    return send_file(mem, mimetype="text/csv", as_attachment=True, download_name="quotes.csv")
-
-# -------------------------------------------------
-# Dev test endpoint (verify without a password)
-# -------------------------------------------------
-@app.get("/dev/send-test-email")
-def dev_send_test():
-    send_email("Test from Grill Shine", ADMIN_EMAIL or "you@example.com",
-               "<p>Test body</p>", "Test body (text)")
-    return "Sent (or printed to console if no SMTP creds / SMTP disabled)."
-
-# -------------------------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
-
-
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
