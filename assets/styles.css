@@ -152,7 +152,7 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 .btn-ghost { border-color: rgba(255,209,102,0.3); color: var(--accent); }
 .btn-ghost:hover { background: rgba(255,209,102,0.15); }
 
-/* ================= HERO ================= */
+/* ================= HERO (Home) ================= */
 .hero {
   position: relative; overflow: hidden; padding: 80px 18px 48px;
   text-align: center; min-height: 420px;
@@ -280,6 +280,55 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 .contact-list a { color: var(--accent); text-decoration: none; }
 .contact-list a:hover { color: var(--focus); }
 
+/* ================= ABOUT PAGE ================= */
+.about-wrap { max-width: 1100px; margin: 0 auto; }
+.about-hero {
+  display: grid; gap: 22px; align-items: center;
+  grid-template-columns: 1.1fr .9fr;
+  background: linear-gradient(180deg, rgba(255,209,102,0.06), transparent);
+  padding: 18px; border-radius: 16px; border: 1px solid rgba(255,209,102,.18);
+}
+.about-hero .logo {
+  max-width: 180px; height: auto; display: block; margin-bottom: 12px;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
+}
+.about-hero h1 {
+  font-family: 'Montserrat', Inter, system-ui, sans-serif;
+  margin: 10px 0 8px; font-size: 36px; color: var(--accent);
+  letter-spacing: .3px;
+}
+.about-hero .lead {
+  margin: 8px 0 12px; color: var(--ink); font-size: 18px; line-height: 1.6;
+}
+.about-hero .bullets {
+  display: grid; gap: 8px; margin: 12px 0 16px; padding-left: 18px;
+}
+.about-hero .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+.about-hero .map-card {
+  background: var(--card); border: 1px solid rgba(255,209,102,.22);
+  border-radius: 16px; padding: 12px; box-shadow: var(--shadow);
+}
+.about-hero .map-card img {
+  width: 100%; height: auto; display: block; border-radius: 12px;
+}
+.about-hero .map-caption {
+  font-size: 14px; color: var(--muted); margin-top: 6px; text-align: center;
+}
+
+.about-grid {
+  display: grid; gap: 16px; margin-top: 28px;
+  grid-template-columns: repeat(3, 1fr);
+}
+.about-card {
+  background: var(--card); border: 1px solid rgba(255,209,102,.22);
+  border-radius: 14px; padding: 16px; box-shadow: var(--shadow);
+}
+.about-card h3 { margin: 0 0 6px; color: var(--accent); }
+.about-card p { margin: 6px 0 0; color: var(--ink); }
+
+.about-fineprint { margin-top: 24px; color: var(--muted); font-size: 14px; }
+
 /* ================= FOOTER ================= */
 .site-footer {
   padding: 28px 18px; text-align: center; color: var(--muted);
@@ -291,6 +340,12 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
   .hero h1 .brand-head { font-size: 78px; }
   .hero h1 .tagline { font-size: 30px; }
   .cards { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 860px) { /* for About grid collapse */
+  .about-hero { grid-template-columns: 1fr; }
+  .about-grid { grid-template-columns: 1fr; }
+  .about-hero h1 { font-size: 28px; }
+  .about-hero .lead { font-size: 17px; }
 }
 @media (max-width: 520px) {
   .hero { min-height: 55vh; }

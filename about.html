@@ -10,25 +10,83 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
+  <!-- Global Styles -->
   <link rel="stylesheet" href="assets/styles.css?v=7" />
+
+  <!-- Page-scoped styles (just for About) -->
+  <style>
+    .about-wrap { max-width: 1100px; margin: 0 auto; }
+    .about-hero {
+      display: grid; gap: 22px; align-items: center;
+      grid-template-columns: 1.1fr .9fr;
+      background: linear-gradient(180deg, rgba(255,209,102,0.06), transparent);
+      padding: 18px; border-radius: 16px; border: 1px solid rgba(255,209,102,.18);
+    }
+    .about-hero .logo {
+      max-width: 180px; height: auto; display: block; margin-bottom: 12px;
+      filter: drop-shadow(0 8px 24px rgba(0,0,0,.35));
+    }
+    .about-hero h1 {
+      font-family: 'Montserrat', Inter, system-ui, sans-serif;
+      margin: 10px 0 8px; font-size: 36px; color: var(--accent);
+      letter-spacing: .3px;
+    }
+    .about-hero .lead {
+      margin: 8px 0 12px; color: var(--ink); font-size: 18px; line-height: 1.6;
+    }
+    .about-hero .bullets {
+      display: grid; gap: 8px; margin: 12px 0 16px; padding-left: 18px;
+    }
+    .about-hero .cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+
+    .about-hero .map-card {
+      background: var(--card); border: 1px solid rgba(255,209,102,.22);
+      border-radius: 16px; padding: 12px; box-shadow: var(--shadow);
+    }
+    .about-hero .map-card img {
+      width: 100%; height: auto; display: block; border-radius: 12px;
+    }
+    .about-hero .map-caption {
+      font-size: 14px; color: var(--muted); margin-top: 6px; text-align: center;
+    }
+
+    .about-grid {
+      display: grid; gap: 16px; margin-top: 28px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .about-card {
+      background: var(--card); border: 1px solid rgba(255,209,102,.22);
+      border-radius: 14px; padding: 16px; box-shadow: var(--shadow);
+    }
+    .about-card h3 { margin: 0 0 6px; color: var(--accent); }
+    .about-card p { margin: 6px 0 0; color: var(--ink); }
+
+    .about-fineprint {
+      margin-top: 24px; color: var(--muted); font-size: 14px;
+    }
+
+    @media (max-width: 860px) {
+      .about-hero { grid-template-columns: 1fr; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-hero h1 { font-size: 28px; }
+      .about-hero .lead { font-size: 17px; }
+    }
+  </style>
 </head>
 <body>
   <!-- Sticky header -->
   <header class="site-header">
-    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand (consistent markup with index) -->
     <a class="brand" href="index.html#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
   </header>
 
-  <!-- Drawer and backdrop OUTSIDE header -->
+  <!-- Drawer and backdrop -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -50,10 +108,59 @@
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main class="section">
-    <h2>About GrillShine</h2>
-    <p>We’re polishing up this page. Check back soon!</p>
-    <img src="assets/img/under-construction.jpg" alt="Under construction"
-         style="max-width:680px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)">
+    <div class="about-wrap">
+      <!-- Intro / Story + Map -->
+      <section class="about-hero">
+        <div>
+          <img src="assets/img/logo2.png" alt="Grill Shine Logo" class="logo">
+          <h1>Locally Owned. Detail Obsessed.</h1>
+          <p class="lead">
+            Grill Shine is an owner-operated service founded on <strong>08/14/2025</strong> and proudly based in the
+            <strong>Greater Tampa Bay</strong> area. We restore grills to their best using <strong>high-temperature steam</strong>—removing
+            grease, residue, and harmful bacteria <em>without harsh chemicals</em>.
+          </p>
+          <p class="lead">
+            Whether it’s your weekend cookout grill or a full outdoor kitchen, we treat every job with the same
+            attention to detail—so your food tastes better, your grill heats evenly, and your equipment lasts longer.
+          </p>
+          <ul class="bullets">
+            <li><strong>Eco-friendly, family & pet safe</strong> steam cleaning</li>
+            <li><strong>On-site convenience</strong>—we come to you</li>
+            <li><strong>Performance first</strong>—even heat, cleaner burners, longer life</li>
+          </ul>
+          <div class="cta">
+            <a class="btn btn-primary" href="index.html#quote">Get a Quote</a>
+            <a class="btn btn-ghost" href="tel:+1-813-555-0199">Call (813) 555-0199</a>
+          </div>
+        </div>
+
+        <aside class="map-card" aria-label="Service area map">
+          <img src="assets/img/TampaMap.jpg" alt="Service Area: Tampa, St. Petersburg, Clearwater, Brandon, Wesley Chapel and nearby communities">
+          <div class="map-caption">Proudly serving Tampa • St. Pete • Clearwater • Brandon • Wesley Chapel &amp; nearby</div>
+        </aside>
+      </section>
+
+      <!-- Values / Trust -->
+      <section class="about-grid">
+        <article class="about-card">
+          <h3>Our Mission</h3>
+          <p>Restore your grill, extend its life, and keep the good times cooking—safely and sustainably.</p>
+        </article>
+        <article class="about-card">
+          <h3>What We Stand For</h3>
+          <p>Quality workmanship, respectful service at your home, and transparent, fair pricing. No shortcuts, no harsh chemicals.</p>
+        </article>
+        <article class="about-card">
+          <h3>Local &amp; Insured</h3>
+          <p>We’re a local, insured, <strong>owner-operator</strong> business. You’ll always know who’s working on your grill.</p>
+        </article>
+      </section>
+
+      <p class="about-fineprint">
+        Grill Shine serves households across Greater Tampa Bay—including Tampa, St. Petersburg, Clearwater, Brandon, Wesley Chapel, and surrounding communities.
+        Not sure if we cover your area? <a href="index.html#contact" class="nav-link">Contact us</a>.
+      </p>
+    </div>
   </main>
 
   <footer class="site-footer">
