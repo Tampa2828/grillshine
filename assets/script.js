@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — stable drawer (only X / ESC / backdrop close it)
+// GrillShine — stable drawer (X / ESC / backdrop close it)
 // ==============================
 
 // Footer year
@@ -13,21 +13,6 @@ const closeBtn = document.getElementById('closeMenu');
 const backdrop = document.getElementById('backdrop');
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// --- CAPTURE-PHASE SHIELD ---
-// Prevent any legacy "document click closes nav" listeners from seeing clicks that START inside the drawer.
-window.addEventListener('click', (e) => {
-  if (!drawer?.classList.contains('open')) return;
-  if (!drawer.contains(e.target)) return;
-  // Allow opting out for specific UI parts inside drawer
-  if (e.target.closest('[data-no-close]')) return;
-  e.stopPropagation();
-  e.stopImmediatePropagation?.();
-}, true); // capture = true
-
-// Also stop bubbling inside the drawer for good measure
-drawer?.addEventListener('click', (e) => e.stopPropagation());
-drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // Sticky-header aware smooth scroll
 function headerOffsetPx() {
@@ -111,7 +96,9 @@ function closeDrawer() {
 toggle?.addEventListener('click', () =>
   drawer?.classList.contains('open') ? closeDrawer() : openDrawer()
 );
-closeBtn?.addEventListener('click', closeDrawer);
+
+// Ensure the ✕ button always closes the drawer
+closeBtn?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeDrawer(); });
 
 // Use pointerdown on the BACKDROP only (no “click anywhere”)
 backdrop?.addEventListener('pointerdown', (e) => {
@@ -123,39 +110,42 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Drawer link handling (anchors + page nav)
-if (drawer) {
-  drawer.addEventListener('click', (e) => {
-    const a = e.target.closest('a');
-    if (!a || !drawer.contains(a)) return;
+// Single handler for drawer clicks: stop bubbling & handle links
+drawer?.addEventListener('click', (e) => {
+  // Don’t let clicks bubble outside the drawer
+  e.stopPropagation();
 
-    const href = a.getAttribute('href') || '';
-    const targetBlank = a.getAttribute('target') === '_blank';
-    const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
+  const a = e.target.closest('a');
+  if (!a || !drawer.contains(a)) return;
 
-    if (!href || targetBlank || modified) return;
+  const href = a.getAttribute('href') || '';
+  const targetBlank = a.getAttribute('target') === '_blank';
+  const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
 
-    // Same-page anchors (e.g., #services or index.html#services)
-    const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
-    if (isSamePageHash) {
-      e.preventDefault();
-      const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
-      closeDrawer();
-      requestAnimationFrame(() => {
-        const el = document.querySelector(selector);
-        if (el) smoothScrollToEl(el);
-        else window.location.hash = selector;
-      });
-      return;
-    }
+  if (!href || targetBlank || modified) return;
 
-    // Cross-page links
+  // Same-page anchors (e.g., #services or index.html#services)
+  const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
+  if (isSamePageHash) {
     e.preventDefault();
-    const url = href;
+    const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
     closeDrawer();
-    setTimeout(() => { window.location.assign(url); }, 100);
-  });
-}
+    requestAnimationFrame(() => {
+      const el = document.querySelector(selector);
+      if (el) smoothScrollToEl(el);
+      else window.location.hash = selector;
+    });
+    return;
+  }
+
+  // Cross-page links
+  e.preventDefault();
+  closeDrawer();
+  setTimeout(() => { window.location.assign(href); }, 100);
+});
+
+// Also prevent pointerdown inside drawer from starting outside-close logic on some setups
+drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // Smooth scrolling for in-page links OUTSIDE the drawer
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -175,7 +165,7 @@ function adjustForHash() {
   if (!location.hash) return;
   const tgt = document.querySelector(location.hash);
   if (!tgt) return;
-  setTimeout(() => smoothScrollToEl(tgt), 100); // slightly longer to wait for layout/fonts
+  setTimeout(() => smoothScrollToEl(tgt), 100); // wait for layout/fonts
 }
 window.addEventListener('load', adjustForHash);
 window.addEventListener('hashchange', adjustForHash);
