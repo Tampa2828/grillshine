@@ -60,7 +60,7 @@ img, picture, video { max-width: 100%; height: auto; }
 }
 .brand-logo {
   display: inline-block; width: 28px; height: 28px;
-  background: url("assets/img/logo.png") center/contain no-repeat;
+  background: url("/assets/img/logo.png") center/contain no-repeat;
 }
 /* Defensive: support pages that used <img class="brand-logo"> */
 img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline-block; }
@@ -86,7 +86,7 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 /* ================= DRAWER ================= */
 .nav-drawer {
   position: fixed; inset: 0 auto 0 0; width: 280px;
-  background: var(--card) !important; /* ensure not see-through */
+  background: var(--card) !important;
   box-shadow: var(--shadow);
   transform: translateX(-100%);
   transition: transform .28s ease;
@@ -151,7 +151,7 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 }
 .hero::before {
   content: ""; position: absolute; inset: 0;
-  background: url("assets/img/tampa-bay.jpg") center/cover no-repeat;
+  background: url("/assets/img/tampa-bay.jpg") center/cover no-repeat;
   opacity: .55; z-index: 0;
 }
 .hero::after {
@@ -196,7 +196,7 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 }
 .page-hero::before{
   content:""; position:absolute; inset:0;
-  background: url("assets/img/tampa-bay.jpg") center/cover no-repeat; /* default */
+  background: url("/assets/img/tampa-bay.jpg") center/cover no-repeat; /* default */
   opacity:.55; z-index:0;
 }
 .page-hero::after{
@@ -222,7 +222,7 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 
 /* About page: swap background image */
 .page-hero--about::before {
-  background-image: url("assets/img/about-hero.jpg?v=1");
+  background-image: url("/assets/img/about-hero.jpg?v=1");
 }
 
 /* ================= SECTIONS ================= */
@@ -368,5 +368,3 @@ img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto; }
 }
-
-
