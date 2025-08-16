@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="assets/styles.css?v=8" />
 
   <style>
-    /* tiny helpers for this page */
     .hidden { display: none !important; }
     .admin-card {
       max-width: 520px; margin: 40px auto 0;
@@ -41,7 +40,7 @@
     </a>
   </header>
 
-  <!-- Drawer & backdrop OUTSIDE header -->
+  <!-- Drawer & backdrop -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -62,7 +61,7 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Page banner (optional – keep consistent look) -->
+  <!-- Page banner -->
   <section class="page-hero page-hero--sm">
     <div class="inner">
       <h1>Admin</h1>
@@ -74,12 +73,11 @@
     <!-- Sign-in card -->
     <section id="admin-gate" class="admin-card">
       <h2>Admin Sign In</h2>
-      <p class="hint">For now this is a simple front-end check. We’ll swap to real auth later.</p>
+      <p class="hint">For now this is a simple front-end check.</p>
       <form id="admin-form" class="admin-form" novalidate>
         <div class="row">
           <label for="admin-user"><strong>Username (optional)</strong></label>
-          <input id="admin-user" name="user" type="text" placeholder="admin" value="admin"
-                 autocomplete="username" />
+          <input id="admin-user" name="user" type="text" placeholder="admin" value="admin" autocomplete="username" />
         </div>
 
         <div class="row">
@@ -99,17 +97,17 @@
 
         <p class="hint" style="margin-top:12px">
           Hint: username <strong>admin</strong> &nbsp; password <strong>password123</strong><br/>
-          …or use the passphrase in the password box: <strong>admin password123</strong>
+          …or type the passphrase in the password box: <strong>admin password123</strong>
         </p>
       </form>
     </section>
 
-    <!-- Admin panel (shown after sign-in) -->
+    <!-- Fallback panel (you’ll rarely see this—auto-redirect goes to quotes) -->
     <section id="admin-panel" class="admin-card hidden" aria-hidden="true">
       <h2>Welcome, Admin</h2>
-      <p>You’re signed in (client-side session). Replace this with real tools (quotes, gallery, etc.).</p>
+      <p>You’re signed in (client-side session).</p>
       <div class="admin-actions" style="margin-top:10px">
-        <a class="btn btn-primary" href="index.html#quote">Go to Quotes</a>
+        <a class="btn btn-primary" href="admin-quotes.html">Go to Quotes</a>
         <button class="btn btn-outline" id="admin-signout" type="button">Sign out</button>
       </div>
       <p class="hint">Front-end only. In production we’ll move to server sessions/tokens.</p>
@@ -123,7 +121,7 @@
   <!-- Shared drawer/smooth-scroll script -->
   <script src="assets/script.js?v=14"></script>
 
-  <!-- Inline gate logic (kept inline so there’s no broken path/caching issues) -->
+  <!-- Inline gate logic -->
   <script>
     // Year
     (document.getElementById('year')||{}).textContent = new Date().getFullYear();
@@ -138,35 +136,38 @@
     const panel    = document.getElementById('admin-panel');
     const signOut  = document.getElementById('admin-signout');
 
-    // Config (frontend-only)
+    // Config
     const USERNAME = 'admin';
     const PASSWORD = 'password123';
     const PASSPHRASE = 'admin password123';
+    const QUOTES_URL = 'admin-quotes.html';
+
+    // Keys used across pages
+    const LOCAL_KEYS = ['gs_admin_signed_in','isAdminSignedIn'];
     const SESSION_KEY = 'gs_admin_logged_in';
 
-    function isAuthed() {
-      try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (_) { return false; }
-    }
-    function setAuthed(v) {
+    const isAuthed = () => {
       try {
-        if (v) sessionStorage.setItem(SESSION_KEY, '1');
-        else sessionStorage.removeItem(SESSION_KEY);
+        const local = LOCAL_KEYS.some(k => localStorage.getItem(k) === '1');
+        const sess  = sessionStorage.getItem(SESSION_KEY) === '1';
+        return local || sess;
+      } catch (_) { return false; }
+    };
+    const setAuthed = (v) => {
+      try {
+        if (v) {
+          LOCAL_KEYS.forEach(k => localStorage.setItem(k,'1'));
+          sessionStorage.setItem(SESSION_KEY,'1');
+        } else {
+          LOCAL_KEYS.forEach(k => localStorage.removeItem(k));
+          sessionStorage.removeItem(SESSION_KEY);
+        }
       } catch (_) {}
-    }
-    function showPanel() {
-      gate.classList.add('hidden');
-      panel.classList.remove('hidden');
-      panel.setAttribute('aria-hidden', 'false');
-    }
-    function showGate() {
-      panel.classList.add('hidden');
-      panel.setAttribute('aria-hidden', 'true');
-      gate.classList.remove('hidden');
-      userEl.focus();
-    }
-    function showError(text) {
-      if (!msgEl) return;
-      msgEl.textContent = text;
+    };
+
+    // If already signed in, go straight to quotes
+    if (isAuthed()) {
+      window.location.replace(QUOTES_URL);
     }
 
     // Toggle password visibility
@@ -175,22 +176,33 @@
       passEl.focus();
     });
 
-    // Submit handler
+    function showError(text){ if (msgEl) msgEl.textContent = text; }
+    function showPanel(){
+      gate.classList.add('hidden');
+      panel.classList.remove('hidden');
+      panel.setAttribute('aria-hidden','false');
+    }
+    function showGate(){
+      panel.classList.add('hidden');
+      panel.setAttribute('aria-hidden','true');
+      gate.classList.remove('hidden');
+      userEl.focus();
+    }
+
+    // Handle submit
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
-
       const u = (userEl.value || '').trim().toLowerCase();
       const p = (passEl.value || '').trim();
 
-      const okUser = !u || u === USERNAME; // username optional but if filled, must match 'admin'
+      const okUser = !u || u === USERNAME; // username optional; if provided must be "admin"
       const okPass = p === PASSWORD || p.toLowerCase() === PASSPHRASE;
 
       if (okUser && okPass) {
         setAuthed(true);
         showError('');
-        showPanel();
-        // optional: scroll into view
-        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Hard redirect to the quotes inbox
+        window.location.assign(QUOTES_URL);
       } else {
         setAuthed(false);
         showError('That username or password didn’t look right. Try again.');
@@ -198,7 +210,7 @@
       }
     });
 
-    // Sign out
+    // Fallback signout (main signout is on the quotes page)
     signOut?.addEventListener('click', () => {
       setAuthed(false);
       passEl.value = '';
@@ -206,9 +218,6 @@
       showGate();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-
-    // On load: show correct view
-    if (isAuthed()) { showPanel(); } else { showGate(); }
   </script>
 </body>
 </html>

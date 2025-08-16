@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Quotes Inbox</title>
+
+  <!-- Fonts & global styles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/styles.css?v=8" />
+
+  <style>
+    /* Small table helpers */
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .left, .right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .searchbox { display:flex; gap:8px; align-items:center; }
+    .searchbox input { padding:10px 12px; border-radius:10px; border:1px solid rgba(255,209,102,.22); background:#0f0f0f; color:var(--ink); min-width:240px; }
+    .select { padding:10px 12px; border-radius:10px; border:1px solid rgba(255,209,102,.22); background:#0f0f0f; color:var(--ink); }
+    .small { font-size:13px; color:var(--muted); }
+    .danger { border-color:#7a2424 !important; color:#ffb0b0 !important; }
+    .danger:hover { background:#7a2424 !important; color:#fff !important; }
+    table.quotes { width:100%; border-collapse:separate; border-spacing:0; overflow:hidden; border-radius:14px; border:1px solid rgba(255,209,102,.18); }
+    table.quotes th, table.quotes td { padding:12px 14px; border-bottom:1px solid rgba(255,209,102,.12); vertical-align:top; }
+    table.quotes th { text-align:left; color:var(--accent); background:rgba(255,209,102,0.05); }
+    table.quotes tr:last-child td { border-bottom:none; }
+    .nowrap { white-space:nowrap; }
+    .pill { display:inline-block; padding:4px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,209,102,.28); }
+    .pill--archived { background:rgba(255,255,255,.06); color:#cfcfcf; }
+    .pill--new { background:rgba(255,209,102,.12); color:#ffd166; }
+    .table-actions { display:flex; gap:8px; }
+    .table-actions .btn { padding:8px 10px; font-weight:700; border-radius:8px; }
+    .muted { color:var(--muted); }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <!-- Sticky header -->
+  <header class="site-header">
+    <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+      <span class="brand-logo" aria-hidden="true"></span>
+      <span class="brand-text">GrillShine</span>
+    </a>
+  </header>
+
+  <!-- Drawer -->
+  <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="drawer-title">Menu</span>
+      <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+    </div>
+    <ul>
+      <li><a href="index.html#top"      class="nav-link">Home</a></li>
+      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="about.html"          class="nav-link">About</a></li>
+      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="admin.html"          class="nav-link">Admin</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
+    </div>
+  </nav>
+  <div id="backdrop" class="backdrop" hidden></div>
+
+  <!-- Banner -->
+  <section class="page-hero page-hero--sm">
+    <div class="inner">
+      <h1>Quotes Inbox</h1>
+      <p class="sub">Review, export, and manage quote requests.</p>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="section" role="main">
+    <div class="about-card" style="margin-bottom:16px">
+      <div class="toolbar">
+        <div class="left">
+          <div class="searchbox">
+            <input id="search" type="search" placeholder="Search name, email, phone, zip, note…" />
+          </div>
+          <select id="statusFilter" class="select">
+            <option value="all">All</option>
+            <option value="new">New</option>
+            <option value="archived">Archived</option>
+          </select>
+          <label class="small" style="display:flex;gap:8px;align-items:center;">
+            <input type="checkbox" id="autoResetToggle" />
+            Auto reset daily (clear on first visit)
+          </label>
+        </div>
+        <div class="right">
+          <button id="refreshBtn" class="btn btn-outline" type="button">Refresh</button>
+          <button id="exportJson" class="btn btn-outline" type="button">Export JSON</button>
+          <button id="exportCsv"  class="btn btn-outline" type="button">Export CSV</button>
+          <input id="importFile" type="file" accept=".json,.csv" class="hidden" />
+          <button id="importBtn" class="btn btn-outline" type="button">Import</button>
+          <button id="clearAll" class="btn danger" type="button">Clear All</button>
+          <button id="signOut"  class="btn btn-ghost" type="button">Sign out</button>
+        </div>
+      </div>
+      <div class="small" id="summary">0 total</div>
+    </div>
+
+    <div class="about-card">
+      <div class="muted small" id="emptyState" style="display:none;">No quotes yet.</div>
+      <div style="overflow:auto;">
+        <table class="quotes" id="quotesTable" aria-label="Quotes table">
+          <thead>
+            <tr>
+              <th class="nowrap">Date</th>
+              <th>Name</th>
+              <th class="nowrap">Phone</th>
+              <th>Email</th>
+              <th class="nowrap">Zip</th>
+              <th>Message</th>
+              <th class="nowrap">Status</th>
+              <th class="nowrap" style="width:1%">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="quotesBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
+  </footer>
+
+  <!-- Shared nav script -->
+  <script src="assets/script.js?v=14"></script>
+
+  <script>
+    // ---------- Session gate ----------
+    (function gate(){
+      const ok = localStorage.getItem('gs_admin_signed_in') === '1' ||
+                 localStorage.getItem('isAdminSignedIn') === '1';
+      if (!ok) { window.location.replace('admin.html'); }
+    })();
+
+    // Year
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // ---------- Storage + helpers ----------
+    const STORAGE_KEYS = ['grillshine_quotes','quoteSubmissions','gs_quotes','quotes'];
+    const STATUS = { NEW:'new', ARCH:'archived' };
+    const RESET_KEY = 'gs_quotes_last_reset';
+    const RESET_TOGGLE = 'gs_quotes_auto_reset'; // '1' when enabled
+
+    const els = {
+      body: document.getElementById('quotesBody'),
+      table: document.getElementById('quotesTable'),
+      empty: document.getElementById('emptyState'),
+      summary: document.getElementById('summary'),
+      search: document.getElementById('search'),
+      filter: document.getElementById('statusFilter'),
+      autoReset: document.getElementById('autoResetToggle'),
+      refresh: document.getElementById('refreshBtn'),
+      exportJson: document.getElementById('exportJson'),
+      exportCsv: document.getElementById('exportCsv'),
+      importBtn: document.getElementById('importBtn'),
+      importFile: document.getElementById('importFile'),
+      clearAll: document.getElementById('clearAll'),
+      signOut: document.getElementById('signOut'),
+    };
+
+    els.autoReset.checked = localStorage.getItem(RESET_TOGGLE) === '1';
+
+    function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+    function getAllQuotes(){
+      for (const k of STORAGE_KEYS){
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try {
+            const arr = JSON.parse(raw);
+            if (Array.isArray(arr)) return {key:k, items:arr};
+          } catch {}
+        }
+      }
+      return {key: STORAGE_KEYS[0], items: []};
+    }
+    function saveQuotes(key, items){
+      localStorage.setItem(key, JSON.stringify(items));
+    }
+
+    function applyDailyReset(quotes){
+      if (!els.autoReset.checked) return quotes;
+      const last = localStorage.getItem(RESET_KEY);
+      const today = todayISO();
+      if (last && last !== today) {
+        // Clear
+        quotes.items = [];
+        saveQuotes(quotes.key, quotes.items);
+      }
+      localStorage.setItem(RESET_KEY, today);
+      return quotes;
+    }
+
+    function normalizeQuote(q){
+      return {
+        id: q.id || (q.timestamp ? String(q.timestamp) : String(Date.now())+'-'+Math.random().toString(36).slice(2,7)),
+        ts: q.ts || q.timestamp || Date.now(),
+        name: q.name || q.fullName || '',
+        phone: q.phone || q.tel || '',
+        email: q.email || '',
+        zip: q.zip || q.postal || '',
+        message: q.message || q.notes || q.msg || '',
+        status: (q.status === STATUS.ARCH ? STATUS.ARCH : STATUS.NEW),
+      };
+    }
+
+    let state = { key: STORAGE_KEYS[0], items: [] };
+
+    function load(){
+      state = getAllQuotes();
+      state = applyDailyReset(state);
+      state.items = state.items.map(normalizeQuote);
+      render();
+    }
+
+    function render(){
+      const term = els.search.value.trim().toLowerCase();
+      const filter = els.filter.value;
+
+      const filtered = state.items.filter(q=>{
+        if (filter !== 'all' && q.status !== filter) return false;
+        if (!term) return true;
+        const t = [q.name,q.phone,q.email,q.zip,q.message].join(' ').toLowerCase();
+        return t.includes(term);
+      });
+
+      els.body.innerHTML = '';
+      els.empty.style.display = filtered.length ? 'none' : 'block';
+      els.summary.textContent = `${state.items.length} total • ${filtered.length} shown`;
+
+      for (const q of filtered.sort((a,b)=>b.ts - a.ts)){
+        const tr = document.createElement('tr');
+        const date = new Date(q.ts);
+        const dstr = date.toLocaleDateString(undefined,{year:'2-digit',month:'2-digit',day:'2-digit'})+' '+date.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+
+        tr.innerHTML = `
+          <td class="nowrap">${dstr}</td>
+          <td>${escapeHtml(q.name)}</td>
+          <td class="nowrap">${escapeHtml(q.phone)}</td>
+          <td>${escapeHtml(q.email)}</td>
+          <td class="nowrap">${escapeHtml(q.zip)}</td>
+          <td>${escapeHtml(q.message)}</td>
+          <td class="nowrap">
+            <span class="pill ${q.status===STATUS.ARCH?'pill--archived':'pill--new'}">${q.status===STATUS.ARCH?'Archived':'New'}</span>
+          </td>
+          <td class="nowrap">
+            <div class="table-actions">
+              <button class="btn btn-outline" data-action="toggle" data-id="${q.id}">${q.status===STATUS.ARCH?'Unarchive':'Archive'}</button>
+              <button class="btn danger" data-action="delete" data-id="${q.id}">Delete</button>
+            </div>
+          </td>
+        `;
+        els.body.appendChild(tr);
+      }
+    }
+
+    function escapeHtml(s){
+      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    // Actions
+    els.body.addEventListener('click', (e)=>{
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      const id = btn.getAttribute('data-id');
+      const action = btn.getAttribute('data-action');
+
+      const idx = state.items.findIndex(x=>x.id===id);
+      if (idx === -1) return;
+
+      if (action === 'toggle'){
+        state.items[idx].status = (state.items[idx].status===STATUS.ARCH? STATUS.NEW : STATUS.ARCH);
+        saveQuotes(state.key, state.items);
+        render();
+      }
+      if (action === 'delete'){
+        if (!confirm('Delete this quote?')) return;
+        state.items.splice(idx,1);
+        saveQuotes(state.key, state.items);
+        render();
+      }
+    });
+
+    // UI controls
+    els.search.addEventListener('input', render);
+    els.filter.addEventListener('change', render);
+    els.refresh.addEventListener('click', load);
+    els.autoReset.addEventListener('change', ()=>{
+      localStorage.setItem(RESET_TOGGLE, els.autoReset.checked ? '1' : '');
+      load();
+    });
+
+    els.clearAll.addEventListener('click', ()=>{
+      if (!confirm('Clear ALL quotes? This cannot be undone.')) return;
+      state.items = [];
+      saveQuotes(state.key, state.items);
+      render();
+    });
+
+    // Export
+    els.exportJson.addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state.items, null, 2)], {type:'application/json'});
+      downloadBlob(blob, `quotes-${todayISO()}.json`);
+    });
+    els.exportCsv.addEventListener('click', ()=>{
+      const header = ['date','name','phone','email','zip','message','status'];
+      const rows = state.items.map(q=>{
+        const d = new Date(q.ts).toISOString();
+        return [d,q.name,q.phone,q.email,q.zip,q.message,q.status].map(csvCell).join(',');
+      });
+      const csv = header.join(',')+'\n'+rows.join('\n');
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      downloadBlob(blob, `quotes-${todayISO()}.csv`);
+    });
+    function csvCell(v){
+      const s = String(v ?? '').replace(/"/g,'""');
+      return `"${s}"`;
+    }
+    function downloadBlob(blob, filename){
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href), 500);
+    }
+
+    // Import
+    els.importBtn.addEventListener('click', ()=> els.importFile.click());
+    els.importFile.addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const text = await file.text();
+      let incoming = [];
+      try {
+        if (file.name.toLowerCase().endsWith('.json')){
+          const data = JSON.parse(text);
+          incoming = Array.isArray(data) ? data : [];
+        } else {
+          // Simple CSV (expects header names used in export)
+          const lines = text.split(/\r?\n/).filter(Boolean);
+          const header = lines.shift()?.split(',').map(s=>s.replace(/^"|"$/g,'').trim()) || [];
+          const idx = Object.fromEntries(header.map((h,i)=>[h,i]));
+          incoming = lines.map(l=>{
+            const cells = l.match(/("([^"]|"")*"|[^,]+)/g)?.map(c=>c.replace(/^"|"$/g,'').replace(/""/g,'"')) || [];
+            return {
+              ts: Date.parse(cells[idx['date']]||Date.now()) || Date.now(),
+              name: cells[idx['name']]||'',
+              phone: cells[idx['phone']]||'',
+              email: cells[idx['email']]||'',
+              zip: cells[idx['zip']]||'',
+              message: cells[idx['message']]||'',
+              status: cells[idx['status']]==='archived'? STATUS.ARCH : STATUS.NEW,
+            };
+          });
+        }
+      } catch(err){
+        alert('Import failed: ' + err.message);
+        return;
+      }
+      if (!incoming.length) { alert('No rows found to import.'); return; }
+      const normalized = incoming.map(normalizeQuote);
+      state.items = dedupe([...state.items, ...normalized]);
+      saveQuotes(state.key, state.items);
+      render();
+      els.importFile.value = '';
+    });
+
+    function dedupe(arr){
+      const seen = new Set();
+      const out = [];
+      for (const q of arr){
+        const k = q.id || (q.email+'_'+q.ts);
+        if (seen.has(k)) continue;
+        seen.add(k); out.push(q);
+      }
+      return out;
+    }
+
+    // Sign out
+    els.signOut.addEventListener('click', ()=>{
+      localStorage.removeItem('gs_admin_signed_in');
+      localStorage.removeItem('isAdminSignedIn');
+      window.location.replace('admin.html');
+    });
+
+    // Initial load
+    load();
+  </script>
+</body>
+</html>
