@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Styles (bump version to refresh) -->
+  <!-- Global styles (v=8 adds subpage banner + solid drawer bg) -->
   <link rel="stylesheet" href="assets/styles.css?v=8" />
 </head>
 <body>
@@ -20,13 +20,14 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
+    <!-- Brand (same markup as index) -->
     <a class="brand" href="index.html#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
   </header>
 
-  <!-- Drawer & backdrop OUTSIDE header (prevents see-through and click issues) -->
+  <!-- Drawer & backdrop OUTSIDE header (prevents see-through & click issues) -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -47,18 +48,34 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <main class="section">
-    <h2>Before &amp; After</h2>
-    <p>Gallery is coming soon. We’ll showcase our best transformations here.</p>
-    <img src="assets/img/under-construction.jpg" alt="Under construction"
-         style="max-width:980px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)">
+  <!-- Subpage banner (uses same Tampa photo via CSS `.page-hero`) -->
+  <section class="page-hero page-hero--sm">
+    <div class="inner">
+      <h1>Before &amp; After</h1>
+      <p class="sub">Real transformations from grills we’ve restored in Greater Tampa Bay.</p>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="section" role="main">
+    <h2>Gallery Coming Soon</h2>
+    <p>We’re curating our first round of transformations. Check back shortly—this page will showcase dramatic before/after results for stainless exteriors, grates, burners, and full outdoor kitchens.</p>
+
+    <img
+      src="assets/img/under-construction.jpg"
+      alt="Under construction"
+      style="max-width:980px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)"
+      loading="lazy"
+      decoding="async"
+    >
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared JS (drawer logic) — bump version to refresh -->
+  <!-- Shared JS (v=14 has stable drawer + Home handling) -->
   <script src="assets/script.js?v=14"></script>
 </body>
 </html>

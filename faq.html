@@ -10,23 +10,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Styles (bump version to refresh cache if needed) -->
+  <!-- Styles (v=8 includes .page-hero for the banner on subpages) -->
   <link rel="stylesheet" href="assets/styles.css?v=8" />
 </head>
 <body>
   <!-- Sticky header -->
   <header class="site-header">
+    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
+    <!-- Brand (consistent with index) -->
     <a class="brand" href="index.html#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
   </header>
 
-  <!-- Drawer & backdrop OUTSIDE header (prevents see-through and click issues) -->
+  <!-- Drawer & backdrop OUTSIDE header (avoids see-through overlay) -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -47,10 +49,48 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
+  <!-- Page banner (uses the same Tampa background as the home hero) -->
+  <section class="page-hero page-hero--sm">
+    <div class="inner">
+      <h1>Frequently Asked Questions</h1>
+      <p class="sub">Quick answers about our eco-friendly BBQ grill steam cleaning.</p>
+      <div class="hero-cta" style="margin-top:14px">
+        <a href="index.html#quote" class="btn btn-primary">Get a Quote</a>
+        <a href="tel:+1-813-555-0199" class="btn btn-ghost">Call (813) 555-0199</a>
+      </div>
+    </div>
+  </section>
+
   <!-- Main Content -->
   <main class="section">
-    <h2>Frequently Asked Questions</h2>
-    <p>We’re writing this up. In the meantime, contact us and we’ll answer right away.</p>
+    <!-- Placeholder until real FAQ copy is ready -->
+    <p>We’re putting the final touches on this page. In the meantime, here are a few quick hits:</p>
+
+    <!-- Accessible, native details/summary accordions -->
+    <div class="cards" style="grid-template-columns: 1fr;">
+      <article class="card">
+        <details>
+          <summary><strong>Do you use harsh chemicals?</strong></summary>
+          <p>No. We clean with high-temperature steam—no harsh chemical residue on your cooking surfaces.</p>
+        </details>
+      </article>
+
+      <article class="card">
+        <details>
+          <summary><strong>Do you come to me?</strong></summary>
+          <p>Yep. We’re a mobile service covering Greater Tampa Bay (Tampa, St. Pete, Clearwater, Brandon, Wesley Chapel &amp; nearby).</p>
+        </details>
+      </article>
+
+      <article class="card">
+        <details>
+          <summary><strong>How do I get a price?</strong></summary>
+          <p>Hit <a href="index.html#quote">Get a Quote</a> and add a few photos—most quotes are same-day.</p>
+        </details>
+      </article>
+    </div>
+
+    <p style="margin-top:18px">Full FAQ coming soon:</p>
     <img src="assets/img/under-construction.jpg" alt="Under construction"
          style="max-width:680px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)">
   </main>
@@ -60,7 +100,7 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared drawer/smooth-scroll script (v=14 includes robust Home handling) -->
+  <!-- Shared drawer/smooth-scroll script (v=14 includes robust Home handling + focus trap) -->
   <script src="assets/script.js?v=14"></script>
 </body>
 </html>
