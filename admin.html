@@ -10,122 +10,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Global Styles (includes .page-hero) -->
-  <link rel="stylesheet" href="assets/styles.css?v=9" />
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="assets/styles.css?v=8" />
 
-  <!-- Page-scoped Admin styles -->
   <style>
-    .admin-wrap { max-width: 1100px; margin: 0 auto; }
-
-    /* LOGIN */
-    .login-wrap { max-width: 520px; margin: 0 auto; }
-    .login-card {
-      background: var(--card);
-      border: 1px solid rgba(255,209,102,.22);
-      border-radius: 16px; box-shadow: var(--shadow);
-      padding: 18px;
-    }
-    .login-card h2 { margin: 0 0 8px; color: var(--accent); }
-    .login-card p { margin: 0 0 12px; color: var(--muted); }
-    .login-row { display: grid; gap: 8px; margin-bottom: 12px; }
-    .login-card label { font-weight: 600; }
-    .login-card input[type="text"],
-    .login-card input[type="password"] {
-      padding: 12px 14px; border-radius: 10px;
-      border: 1px solid rgba(255,209,102,.22); background: #0f0f0f; color: var(--ink);
-      outline: none; transition: border-color .15s ease, box-shadow .15s ease;
-    }
-    .login-card input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(255,209,102,.15);
-    }
-    .login-actions { display:flex; align-items:center; gap: 10px; justify-content: space-between; }
-    .login-error { color: #ff8484; min-height: 16px; font-size: 13px; }
-
-    /* Toolbar */
-    .admin-toolbar {
-      display: grid; gap: 10px; grid-template-columns: 1fr 1fr 1fr;
-      margin-bottom: 16px;
-    }
-    .admin-toolbar .group { display: flex; gap: 10px; flex-wrap: wrap; }
-    .admin-toolbar input[type="search"],
-    .admin-toolbar select {
-      padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,209,102,.22);
-      background: #0f0f0f; color: var(--ink); min-width: 200px;
-    }
-
-    /* Table */
+    /* tiny helpers for this page */
+    .hidden { display: none !important; }
     .admin-card {
+      max-width: 520px; margin: 40px auto 0;
       background: var(--card); border: 1px solid rgba(255,209,102,.22);
-      border-radius: 14px; box-shadow: var(--shadow); overflow: hidden;
+      border-radius: 14px; box-shadow: var(--shadow); padding: 22px;
     }
-    table.admin { width: 100%; border-collapse: collapse; }
-    table.admin thead th {
-      text-align: left; font-weight: 700; color: var(--accent);
-      padding: 12px; border-bottom: 1px solid rgba(255,209,102,.22);
-      background: rgba(255,209,102,.04);
-    }
-    table.admin tbody td {
-      padding: 10px 12px; border-top: 1px solid rgba(255,209,102,.12);
-      vertical-align: top;
-    }
-    table.admin tbody tr:hover { background: rgba(255,255,255,.02); }
-
-    .status {
-      display: inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 700;
-      border: 1px solid transparent;
-    }
-    .status--new        { background: rgba(214, 162, 232, .15); border-color: rgba(214,162,232,.35); }
-    .status--contacted  { background: rgba(124,196,255,.15);  border-color: rgba(124,196,255,.35); }
-    .status--scheduled  { background: rgba(255,209,102,.15);  border-color: rgba(255,209,102,.35); }
-    .status--completed  { background: rgba(108,245,164,.15);  border-color: rgba(108,245,164,.35); }
-    .status--archived   { background: rgba(200,200,200,.12);  border-color: rgba(200,200,200,.28); color:#cfcfcf; }
-
-    .tight { white-space: nowrap; }
-    .muted { color: var(--muted); font-size: 12px; }
-
-    .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .btn-xs {
-      padding: 8px 10px; border-radius: 8px; font-size: 12px; font-weight: 700;
-      border: 1px solid rgba(255,209,102,.3); background: transparent; color: var(--accent);
-      cursor: pointer;
-    }
-    .btn-xs:hover { background: rgba(255,209,102,.12); }
-    .btn-danger { border-color: rgba(214,40,40,.4); color: #ff9b9b; }
-    .btn-danger:hover { background: rgba(214,40,40,.15); }
-
-    /* Modal */
-    .modal-backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,.6);
-      display: none; align-items: center; justify-content: center; z-index: 2000;
-    }
-    .modal-backdrop.show { display: flex; }
-    .modal {
-      width: min(680px, 92vw); background: var(--card);
-      border: 1px solid rgba(255,209,102,.22); border-radius: 16px; box-shadow: var(--shadow);
-      padding: 16px;
-    }
-    .modal header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .modal h3 { margin: 0; color: var(--accent); }
-    .modal .close-x { background: none; border: none; color: var(--accent); font-size: 22px; cursor: pointer; }
-    .modal .grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-    .modal .grid .col { display: grid; gap: 8px; }
-    .modal label { font-weight: 600; }
-    .modal input, .modal textarea, .modal select {
-      padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255,209,102,.22);
-      background: #0f0f0f; color: var(--ink);
-    }
-    .modal textarea { min-height: 120px; resize: vertical; }
-    .modal footer { margin-top: 12px; display: flex; gap: 10px; justify-content: flex-end; }
-
-    /* Empty state */
-    .empty { padding: 22px; text-align: center; color: var(--muted); }
-
-    @media (max-width: 860px) {
-      .admin-toolbar { grid-template-columns: 1fr; }
-      .modal .grid { grid-template-columns: 1fr; }
-      .tight { white-space: normal; }
-    }
+    .admin-card h2 { margin: 0 0 10px; color: var(--accent); }
+    .admin-form .row { display: grid; gap: 6px; margin-bottom: 14px; }
+    .admin-actions { display:flex; gap:10px; align-items:center; }
+    .hint { color: var(--muted); font-size: 12.5px; margin-top: 10px; }
+    .switch { display:flex; gap:8px; align-items:center; margin: 6px 0 2px; font-size: 14px; color: var(--muted); }
   </style>
 </head>
 <body>
@@ -154,8 +54,7 @@
       <li><a href="about.html"          class="nav-link">About</a></li>
       <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
       <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-      <li><a href="contact.html"        class="nav-link">Contact</a></li>
-      <li><a href="admin.html"          class="nav-link">Admin</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
     </ul>
     <div class="nav-cta">
       <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
@@ -163,511 +62,153 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Banner -->
+  <!-- Page banner (optional – keep consistent look) -->
   <section class="page-hero page-hero--sm">
     <div class="inner">
-      <h1>Admin Dashboard</h1>
-      <p class="sub">Sign in to manage inbound quotes, statuses, notes, and export CSV.</p>
+      <h1>Admin</h1>
+      <p class="sub">Temporary front-end gate. We’ll swap to real auth later.</p>
     </div>
   </section>
 
-  <!-- LOGIN GATE -->
-  <section id="loginGate" class="section" aria-labelledby="loginTitle">
-    <div class="login-wrap">
-      <div class="login-card">
-        <h2 id="loginTitle">Admin Sign In</h2>
-        <p>For now this is a simple front-end check. We’ll swap to real auth later.</p>
-
-        <form id="loginForm" novalidate>
-          <div class="login-row">
-            <label for="lg_user">Username (optional)</label>
-            <input id="lg_user" type="text" placeholder="admin" autocomplete="username" />
-          </div>
-          <div class="login-row">
-            <label for="lg_pass">Password</label>
-            <input id="lg_pass" type="password" placeholder="••••••••••" autocomplete="current-password" required />
-            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-              <input id="lg_show" type="checkbox" />
-              <label for="lg_show" class="muted" style="cursor:pointer;">Show password</label>
-            </div>
-          </div>
-          <div class="login-actions">
-            <button class="btn btn-primary" type="submit">Sign In</button>
-            <span id="lg_error" class="login-error" role="alert"></span>
-          </div>
-          <p class="muted" style="margin-top:10px;">
-            Hint: username <strong>admin</strong> &nbsp; password <strong>password123</strong>
-            <br/>…or use the passphrase <strong>admin password123</strong>
-          </p>
-        </form>
-      </div>
-    </div>
-  </section>
-
-  <!-- APP (hidden until authenticated) -->
-  <main id="app" class="section" role="main" hidden>
-    <div class="admin-wrap">
-      <!-- Toolbar -->
-      <div class="admin-toolbar">
-        <div class="group">
-          <input id="search" type="search" placeholder="Search name, email, phone, notes…" />
-          <select id="filterStatus" aria-label="Filter by status">
-            <option value="">All statuses</option>
-            <option value="new">New</option>
-            <option value="contacted">Contacted</option>
-            <option value="scheduled">Scheduled</option>
-            <option value="completed">Completed</option>
-            <option value="archived">Archived</option>
-          </select>
+  <main class="section" role="main">
+    <!-- Sign-in card -->
+    <section id="admin-gate" class="admin-card">
+      <h2>Admin Sign In</h2>
+      <p class="hint">For now this is a simple front-end check. We’ll swap to real auth later.</p>
+      <form id="admin-form" class="admin-form" novalidate>
+        <div class="row">
+          <label for="admin-user"><strong>Username (optional)</strong></label>
+          <input id="admin-user" name="user" type="text" placeholder="admin" value="admin"
+                 autocomplete="username" />
         </div>
-        <div class="group">
-          <select id="sortBy" aria-label="Sort by">
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="name">Name (A–Z)</option>
-            <option value="status">Status</option>
-          </select>
-          <button id="exportCsv" class="btn btn-outline">Export CSV</button>
-        </div>
-        <div class="group" style="justify-content:flex-end">
-          <button id="bulkCompleted" class="btn btn-outline">Mark Completed</button>
-          <button id="bulkArchive" class="btn btn-danger">Archive</button>
-          <button id="seedDemo" class="btn btn-ghost">Add Demo Data</button>
-          <button id="clearDemo" class="btn btn-ghost">Clear Data</button>
-          <button id="logoutBtn" class="btn btn-ghost" title="Sign out">Logout</button>
-        </div>
-      </div>
 
-      <!-- Table -->
-      <div class="admin-card">
-        <table class="admin" id="quotesTable" aria-describedby="tableHelp">
-          <thead>
-            <tr>
-              <th><input type="checkbox" id="checkAll" aria-label="Select all" /></th>
-              <th>Created</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Location</th>
-              <th class="tight">Size</th>
-              <th class="tight">Last Cleaned</th>
-              <th class="tight">Images</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-        <div id="emptyState" class="empty" hidden>No quotes yet. Click <strong>Add Demo Data</strong> to populate a few rows.</div>
-        <div class="muted" id="tableHelp" style="padding:10px 12px;">Tip: Click a row’s <em>View/Edit</em> to update notes or status.</div>
+        <div class="row">
+          <label for="admin-pass"><strong>Password</strong></label>
+          <input id="admin-pass" name="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+          <label class="switch">
+            <input type="checkbox" id="showpass" /> Show password
+          </label>
+        </div>
+
+        <div id="admin-msg" class="error" role="alert" aria-live="polite"></div>
+
+        <div class="admin-actions">
+          <button class="btn btn-primary" id="admin-submit" type="submit">Sign In</button>
+          <a class="btn btn-ghost" href="index.html#top">Back to site</a>
+        </div>
+
+        <p class="hint" style="margin-top:12px">
+          Hint: username <strong>admin</strong> &nbsp; password <strong>password123</strong><br/>
+          …or use the passphrase in the password box: <strong>admin password123</strong>
+        </p>
+      </form>
+    </section>
+
+    <!-- Admin panel (shown after sign-in) -->
+    <section id="admin-panel" class="admin-card hidden" aria-hidden="true">
+      <h2>Welcome, Admin</h2>
+      <p>You’re signed in (client-side session). Replace this with real tools (quotes, gallery, etc.).</p>
+      <div class="admin-actions" style="margin-top:10px">
+        <a class="btn btn-primary" href="index.html#quote">Go to Quotes</a>
+        <button class="btn btn-outline" id="admin-signout" type="button">Sign out</button>
       </div>
-    </div>
+      <p class="hint">Front-end only. In production we’ll move to server sessions/tokens.</p>
+    </section>
   </main>
 
   <footer class="site-footer">
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Modal -->
-  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document" aria-labelledby="modalTitle">
-      <header>
-        <h3 id="modalTitle">Quote Details</h3>
-        <button class="close-x" id="modalClose" aria-label="Close">✕</button>
-      </header>
-      <div class="grid">
-        <div class="col">
-          <label>Name
-            <input id="m_name" type="text" disabled />
-          </label>
-          <label>Email
-            <input id="m_email" type="email" disabled />
-          </label>
-          <label>Phone
-            <input id="m_phone" type="text" disabled />
-          </label>
-          <label>Location
-            <input id="m_location" type="text" disabled />
-          </label>
-        </div>
-        <div class="col">
-          <label>Status
-            <select id="m_status">
-              <option value="new">New</option>
-              <option value="contacted">Contacted</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="completed">Completed</option>
-              <option value="archived">Archived</option>
-            </select>
-          </label>
-          <label>Grill Size
-            <input id="m_size" type="text" disabled />
-          </label>
-          <label>Last Cleaned
-            <input id="m_lastclean" type="text" disabled />
-          </label>
-          <label>Images
-            <input id="m_images" type="text" disabled />
-          </label>
-        </div>
-      </div>
-      <label style="display:block; margin-top:10px;">Internal Notes
-        <textarea id="m_notes" placeholder="Add notes visible only to you…"></textarea>
-      </label>
-      <footer>
-        <button id="modalSave" class="btn btn-primary">Save</button>
-        <button id="modalCancel" class="btn btn-outline">Cancel</button>
-      </footer>
-    </div>
-  </div>
-
-  <!-- Shared nav/smooth-scroll script -->
+  <!-- Shared drawer/smooth-scroll script -->
   <script src="assets/script.js?v=14"></script>
 
-  <!-- Admin logic + Login gate -->
+  <!-- Inline gate logic (kept inline so there’s no broken path/caching issues) -->
   <script>
-    // Footer year
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+    // Year
+    (document.getElementById('year')||{}).textContent = new Date().getFullYear();
 
-    // Auth
-    const AUTH_KEY = 'gs_admin_authed_v1';
-    const loginGate = document.getElementById('loginGate');
-    const app = document.getElementById('app');
+    // Elements
+    const form     = document.getElementById('admin-form');
+    const userEl   = document.getElementById('admin-user');
+    const passEl   = document.getElementById('admin-pass');
+    const msgEl    = document.getElementById('admin-msg');
+    const showEl   = document.getElementById('showpass');
+    const gate     = document.getElementById('admin-gate');
+    const panel    = document.getElementById('admin-panel');
+    const signOut  = document.getElementById('admin-signout');
 
-    const loginForm = document.getElementById('loginForm');
-    const lg_user = document.getElementById('lg_user');
-    const lg_pass = document.getElementById('lg_pass');
-    const lg_show = document.getElementById('lg_show');
-    const lg_error = document.getElementById('lg_error');
+    // Config (frontend-only)
+    const USERNAME = 'admin';
+    const PASSWORD = 'password123';
+    const PASSPHRASE = 'admin password123';
+    const SESSION_KEY = 'gs_admin_logged_in';
 
-    function isAuthed() { return sessionStorage.getItem(AUTH_KEY) === '1'; }
-    function setAuthed(v) { v ? sessionStorage.setItem(AUTH_KEY, '1') : sessionStorage.removeItem(AUTH_KEY); }
+    function isAuthed() {
+      try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (_) { return false; }
+    }
+    function setAuthed(v) {
+      try {
+        if (v) sessionStorage.setItem(SESSION_KEY, '1');
+        else sessionStorage.removeItem(SESSION_KEY);
+      } catch (_) {}
+    }
+    function showPanel() {
+      gate.classList.add('hidden');
+      panel.classList.remove('hidden');
+      panel.setAttribute('aria-hidden', 'false');
+    }
+    function showGate() {
+      panel.classList.add('hidden');
+      panel.setAttribute('aria-hidden', 'true');
+      gate.classList.remove('hidden');
+      userEl.focus();
+    }
+    function showError(text) {
+      if (!msgEl) return;
+      msgEl.textContent = text;
+    }
 
-    lg_show?.addEventListener('change', () => {
-      lg_pass.type = lg_show.checked ? 'text' : 'password';
-      lg_pass.focus();
+    // Toggle password visibility
+    showEl?.addEventListener('change', () => {
+      passEl.type = showEl.checked ? 'text' : 'password';
+      passEl.focus();
     });
 
-    function showLogin() {
-      loginGate.hidden = false;
-      app.hidden = true;
-      lg_user?.focus();
-    }
-    function showApp() {
-      loginGate.hidden = true;
-      app.hidden = false;
-      initAdmin(); // boot the dashboard logic only when authed
-      document.getElementById('search')?.focus();
-    }
-
-    // Accept: (user === 'admin' && pass === 'password123') OR passphrase 'admin password123' OR just 'password123'
-    function credsValid(u, p) {
-      const userOk = (u || '').trim().toLowerCase() === 'admin';
-      return (userOk && p === 'password123') || p === 'admin password123' || p === 'password123';
-    }
-
-    loginForm?.addEventListener('submit', (e) => {
+    // Submit handler
+    form?.addEventListener('submit', (e) => {
       e.preventDefault();
-      lg_error.textContent = '';
-      const u = lg_user.value;
-      const p = lg_pass.value;
-      if (!p) { lg_error.textContent = 'Please enter the password.'; lg_pass.focus(); return; }
-      if (!credsValid(u, p)) { lg_error.textContent = 'Invalid credentials.'; lg_pass.focus(); return; }
-      setAuthed(true);
-      showApp();
+
+      const u = (userEl.value || '').trim().toLowerCase();
+      const p = (passEl.value || '').trim();
+
+      const okUser = !u || u === USERNAME; // username optional but if filled, must match 'admin'
+      const okPass = p === PASSWORD || p.toLowerCase() === PASSPHRASE;
+
+      if (okUser && okPass) {
+        setAuthed(true);
+        showError('');
+        showPanel();
+        // optional: scroll into view
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        setAuthed(false);
+        showError('That username or password didn’t look right. Try again.');
+        passEl.focus();
+      }
     });
 
-    if (isAuthed()) showApp(); else showLogin();
+    // Sign out
+    signOut?.addEventListener('click', () => {
+      setAuthed(false);
+      passEl.value = '';
+      showError('');
+      showGate();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-    // ========= Admin App (only runs after showApp) =========
-    function initAdmin() {
-      // Storage
-      const STORAGE_KEY = 'gs_admin_quotes_v1';
-
-      const tbody = document.getElementById('tbody');
-      const emptyState = document.getElementById('emptyState');
-      const checkAll = document.getElementById('checkAll');
-
-      const search = document.getElementById('search');
-      const filterStatus = document.getElementById('filterStatus');
-      const sortBy = document.getElementById('sortBy');
-      const exportCsv = document.getElementById('exportCsv');
-      const bulkCompleted = document.getElementById('bulkCompleted');
-      const bulkArchive = document.getElementById('bulkArchive');
-      const seedDemo = document.getElementById('seedDemo');
-      const clearDemo = document.getElementById('clearDemo');
-      const logoutBtn = document.getElementById('logoutBtn');
-
-      // Modal elements
-      window.m_name = document.getElementById('m_name');
-      window.m_email = document.getElementById('m_email');
-      window.m_phone = document.getElementById('m_phone');
-      window.m_location = document.getElementById('m_location');
-      window.m_status = document.getElementById('m_status');
-      window.m_size = document.getElementById('m_size');
-      window.m_lastclean = document.getElementById('m_lastclean');
-      window.m_images = document.getElementById('m_images');
-      window.m_notes = document.getElementById('m_notes');
-
-      const modalBackdrop = document.getElementById('modalBackdrop');
-      const modalClose = document.getElementById('modalClose');
-      const modalCancel = document.getElementById('modalCancel');
-      const modalSave = document.getElementById('modalSave');
-
-      let state = { data: [], filtered: [], selectedIds: new Set(), currentId: null };
-
-      function getData() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-        catch { return []; }
-      }
-      function saveData(arr) { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
-
-      function demoData() {
-        const now = Date.now();
-        return [
-          { id: 'q1', created: now - 3600e3*6,  name: 'Alex Rivera',   email: 'alex@example.com',   phone: '(813) 555-0123', location: 'Westchase', size:'4–5 burners', last:'6–12 months', images:2, status:'new',        notes:'' },
-          { id: 'q2', created: now - 3600e3*24, name: 'Bri Chen',      email: 'bri@example.com',    phone: '(727) 555-0198', location: 'St. Pete',   size:'2–3 burners', last:'1+ year',     images:1, status:'contacted', notes:'Left VM, follow up tomorrow.' },
-          { id: 'q3', created: now - 3600e3*48, name: 'Chris Morgan',  email: 'chris@example.com',  phone: '(813) 555-0144', location: 'Brandon',    size:'6+ burners',  last:'3–6 months',  images:3, status:'scheduled', notes:'Sat 10am window.' },
-          { id: 'q4', created: now - 3600e3*72, name: 'Dana Patel',    email: 'dana@example.com',   phone: '(813) 555-0177', location: 'Wesley Chapel', size:'4–5 burners', last:'Under 3 months', images:0, status:'completed', notes:'Great result, asked for 6-month reminder.' },
-        ];
-      }
-
-      function fmtDate(ts) {
-        const d = new Date(ts);
-        return d.toLocaleDateString(undefined, { month:'short', day:'2-digit', year:'numeric' }) +
-               ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-      }
-
-      function statusClass(st) {
-        return {
-          new:'status--new', contacted:'status--contacted', scheduled:'status--scheduled',
-          completed:'status--completed', archived:'status--archived'
-        }[st] || 'status--new';
-      }
-
-      function applyFilters() {
-        const q = (search.value || '').toLowerCase().trim();
-        const f = filterStatus.value;
-        let arr = [...state.data];
-
-        if (q) {
-          arr = arr.filter(r =>
-            (r.name||'').toLowerCase().includes(q) ||
-            (r.email||'').toLowerCase().includes(q) ||
-            (r.phone||'').toLowerCase().includes(q) ||
-            (r.location||'').toLowerCase().includes(q) ||
-            (r.notes||'').toLowerCase().includes(q)
-          );
-        }
-        if (f) arr = arr.filter(r => r.status === f);
-
-        switch (sortBy.value) {
-          case 'oldest': arr.sort((a,b)=> a.created-b.created); break;
-          case 'name':   arr.sort((a,b)=> (a.name||'').localeCompare(b.name||'')); break;
-          case 'status': arr.sort((a,b)=> (a.status||'').localeCompare(b.status||'')); break;
-          default:       arr.sort((a,b)=> b.created-a.created); // newest
-        }
-
-        state.filtered = arr;
-        render();
-      }
-
-      function render() {
-        tbody.innerHTML = '';
-        state.selectedIds.clear();
-        checkAll.checked = false;
-
-        if (!state.filtered.length) { emptyState.hidden = false; return; }
-        emptyState.hidden = true;
-
-        for (const r of state.filtered) {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td><input type="checkbox" data-id="\${r.id}" class="rowcheck" aria-label="Select \${r.name||'quote'}"></td>
-            <td><div class="tight">\${fmtDate(r.created)}</div></td>
-            <td>\${r.name||''}</td>
-            <td>
-              <div>\${r.email||''}</div>
-              <div class="muted">\${r.phone||''}</div>
-            </td>
-            <td>\${r.location||''}</td>
-            <td class="tight">\${r.size||''}</td>
-            <td class="tight">\${r.last||''}</td>
-            <td class="tight">\${r.images||0}</td>
-            <td><span class="status \${statusClass(r.status)}">\${(r.status||'new').toUpperCase()}</span></td>
-            <td>
-              <div class="row-actions">
-                <button class="btn-xs" data-action="view" data-id="\${r.id}">View/Edit</button>
-                <button class="btn-xs" data-action="mark-contacted" data-id="\${r.id}">Contacted</button>
-                <button class="btn-xs" data-action="mark-scheduled" data-id="\${r.id}">Scheduled</button>
-                <button class="btn-xs" data-action="mark-completed" data-id="\${r.id}">Completed</button>
-                <button class="btn-xs btn-danger" data-action="archive" data-id="\${r.id}">Archive</button>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        }
-      }
-
-      // Selection
-      checkAll.addEventListener('change', () => {
-        state.selectedIds.clear();
-        document.querySelectorAll('.rowcheck').forEach(cb => {
-          cb.checked = checkAll.checked;
-          if (cb.checked) state.selectedIds.add(cb.dataset.id);
-        });
-      });
-      tbody.addEventListener('change', (e) => {
-        const cb = e.target.closest('.rowcheck');
-        if (!cb) return;
-        if (cb.checked) state.selectedIds.add(cb.dataset.id);
-        else state.selectedIds.delete(cb.dataset.id);
-      });
-
-      // Row actions
-      tbody.addEventListener('click', (e) => {
-        const btn = e.target.closest('button[data-action]');
-        if (!btn) return;
-        const id = btn.dataset.id;
-        const action = btn.dataset.action;
-        if (action === 'view') return openModal(id);
-
-        const map = {
-          'mark-contacted':'contacted',
-          'mark-scheduled':'scheduled',
-          'mark-completed':'completed',
-          'archive':'archived'
-        };
-        const newStatus = map[action];
-        if (!newStatus) return;
-
-        state.data = state.data.map(r => r.id === id ? { ...r, status:newStatus } : r);
-        saveData(state.data);
-        applyFilters();
-      });
-
-      // Bulk
-      function bulkSet(status) {
-        if (!state.selectedIds.size) return;
-        state.data = state.data.map(r => state.selectedIds.has(r.id) ? { ...r, status } : r);
-        saveData(state.data);
-        applyFilters();
-      }
-      bulkCompleted.addEventListener('click', () => bulkSet('completed'));
-      bulkArchive.addEventListener('click', () => bulkSet('archived'));
-
-      // Filters/sort/search
-      [search, filterStatus, sortBy].forEach(el => el.addEventListener('input', applyFilters));
-
-      // CSV Export
-      exportCsv.addEventListener('click', () => {
-        const rows = state.filtered.length ? state.filtered : state.data;
-        if (!rows.length) return;
-
-        const headers = ['id','created','name','email','phone','location','size','last_cleaned','images','status','notes'];
-        const lines = [headers.join(',')];
-        for (const r of rows) {
-          const vals = [
-            r.id,
-            new Date(r.created).toISOString(),
-            r.name||'',
-            r.email||'',
-            r.phone||'',
-            r.location||'',
-            r.size||'',
-            r.last||'',
-            r.images||0,
-            r.status||'new',
-            (r.notes||'').replace(/\n/g,' ').replace(/"/g,'""')
-          ];
-          lines.push(vals.map(v => `"${String(v)}"`).join(','));
-        }
-        const blob = new Blob([lines.join('\n')], { type:'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'grillshine-quotes.csv';
-        document.body.appendChild(a); a.click(); a.remove();
-        URL.revokeObjectURL(url);
-      });
-
-      // Demo data
-      function demoMore(base) {
-        return base.map(r => ({ ...r, id: r.id + '-' + Math.random().toString(36).slice(2,7), created: r.created - Math.floor(Math.random()*3600e3*12)}));
-      }
-      seedDemo.addEventListener('click', () => {
-        const current = getData();
-        if (!current.length) {
-          saveData(demoData());
-        } else {
-          saveData(current.concat(demoMore(demoData())));
-        }
-        state.data = getData();
-        applyFilters();
-      });
-      clearDemo.addEventListener('click', () => {
-        localStorage.removeItem(STORAGE_KEY);
-        state.data = [];
-        applyFilters();
-      });
-
-      // Modal
-      function openModal(id) {
-        const r = state.data.find(x => x.id === id);
-        if (!r) return;
-        state.currentId = id;
-
-        m_name.value = r.name || '';
-        m_email.value = r.email || '';
-        m_phone.value = r.phone || '';
-        m_location.value = r.location || '';
-        m_status.value = r.status || 'new';
-        m_size.value = r.size || '';
-        m_lastclean.value = r.last || '';
-        m_images.value = String(r.images || 0);
-        m_notes.value = r.notes || '';
-
-        modalBackdrop.classList.add('show');
-        modalBackdrop.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-        document.getElementById('modalClose').focus();
-      }
-      function closeModal() {
-        modalBackdrop.classList.remove('show');
-        modalBackdrop.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-        state.currentId = null;
-      }
-      document.getElementById('modalClose').addEventListener('click', closeModal);
-      document.getElementById('modalCancel').addEventListener('click', closeModal);
-      modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modalBackdrop.classList.contains('show')) closeModal(); });
-
-      document.getElementById('modalSave').addEventListener('click', () => {
-        if (!state.currentId) return;
-        state.data = state.data.map(r => r.id === state.currentId ? {
-          ...r,
-          status: m_status.value || 'new',
-          notes: m_notes.value || r.notes || ''
-        } : r);
-        saveData(state.data);
-        closeModal();
-        applyFilters();
-      });
-
-      // Logout
-      logoutBtn.addEventListener('click', () => {
-        setAuthed(false);
-        location.reload();
-      });
-
-      // Init
-      (function init() {
-        const data = getData();
-        if (!data.length) saveData([]);
-        state.data = getData();
-        applyFilters();
-      })();
-    }
+    // On load: show correct view
+    if (isAuthed()) { showPanel(); } else { showGate(); }
   </script>
 </body>
 </html>
