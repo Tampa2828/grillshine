@@ -1,166 +1,146 @@
 # app.py
-import os, json, sqlite3, datetime as dt
+import os, sqlite3, logging, datetime
 from pathlib import Path
-from flask import Flask, request, redirect, send_from_directory, jsonify, abort
+from flask import Flask, request, redirect, send_from_directory, abort
+from werkzeug.utils import secure_filename
 
-# ---------- paths ----------
-ROOT = Path(__file__).resolve().parent
-STATIC_DIR = ROOT  # serve project root (index.html, assets/, etc.)
-UPLOAD_DIR = ROOT / "static" / "uploads"
+# ---------- Paths & setup ----------
+BASE_DIR   = Path(__file__).resolve().parent
+DB_PATH    = BASE_DIR / "quotes.db"
+UPLOAD_DIR = BASE_DIR / "uploads"         # use /tmp on Render if you prefer: Path("/tmp/uploads")
+
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-JSON_LOG = ROOT / "static" / "quotes.json"   # admin-quotes.html can fetch this
 
-DB_PATH = ROOT / "quotes.db"
+logging.basicConfig(level=logging.INFO)
+log = logging.getLogger("grillshine")
 
-# ---------- app ----------
-app = Flask(
-    __name__,
-    static_folder=str(STATIC_DIR),
-    static_url_path=""  # so /assets/... and root files are served
-)
+# ---------- Flask ----------
+app = Flask(__name__, static_folder=str(BASE_DIR), static_url_path="")
 
-ALLOWED_EXTS = {"png", "jpg", "jpeg", "webp", "gif", "heic", "heif"}
-MAX_FILES = 8
+# Serve index and any static asset from the repo root
+@app.get("/")
+def home():
+    return send_from_directory(BASE_DIR, "index.html")
 
-def allowed(filename: str) -> bool:
-    return "." in filename and filename.rsplit(".", 1)[-1].lower() in ALLOWED_EXTS
+@app.get("/<path:filename>")
+def static_files(filename):
+    # allow serving /assets/*, subpages, thank-you.html, etc.
+    full = BASE_DIR / filename
+    if full.exists():
+        return send_from_directory(BASE_DIR, filename)
+    abort(404)
 
-# ---------- db ----------
+@app.get("/healthz")
+def healthz():
+    return "ok", 200
+
+# ---------- DB ----------
 def init_db():
-    with sqlite3.connect(DB_PATH) as con:
+    con = sqlite3.connect(DB_PATH)
+    try:
         con.execute("""
             CREATE TABLE IF NOT EXISTS quotes (
-              id INTEGER PRIMARY KEY AUTOINCREMENT,
-              name TEXT,
-              email TEXT,
-              phone TEXT,
-              details TEXT,
-              files_json TEXT,
-              created_at TEXT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at TEXT NOT NULL,
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                phone TEXT,
+                details TEXT,
+                file_paths TEXT
             )
         """)
+        con.commit()
+    finally:
+        con.close()
+
 init_db()
 
-def insert_quote(name, email, phone, details, files):
-    with sqlite3.connect(DB_PATH) as con:
+def save_quote(name, email, phone, details, file_paths):
+    con = sqlite3.connect(DB_PATH)
+    try:
         con.execute(
-            "INSERT INTO quotes (name, email, phone, details, files_json, created_at) VALUES (?,?,?,?,?,?)",
-            (name, email, phone, details, json.dumps(files), dt.datetime.utcnow().isoformat())
+            "INSERT INTO quotes (created_at, name, email, phone, details, file_paths) VALUES (?,?,?,?,?,?)",
+            (datetime.datetime.utcnow().isoformat(timespec="seconds")+"Z",
+             name, email, phone, details, ",".join(file_paths) if file_paths else "")
         )
+        con.commit()
+    finally:
+        con.close()
 
-def read_quotes(limit=500):
-    with sqlite3.connect(DB_PATH) as con:
-        con.row_factory = sqlite3.Row
-        rows = con.execute(
-            "SELECT id, name, email, phone, details, files_json, created_at FROM quotes ORDER BY id DESC LIMIT ?",
-            (limit,)
-        ).fetchall()
-    quotes = []
-    for r in rows:
-        files = []
-        try:
-            files = json.loads(r["files_json"]) if r["files_json"] else []
-        except Exception:
-            pass
-        quotes.append({
-            "id": r["id"],
-            "name": r["name"],
-            "email": r["email"],
-            "phone": r["phone"],
-            "details": r["details"],
-            "files": files,
-            "created_at": r["created_at"],
-        })
-    return quotes
+# ---------- Email (optional – won’t crash if missing) ----------
+def try_send_emails(payload, attachments):
+    """
+    Best-effort: if email_utils is present and configured, send.
+    If not, just log a warning and continue (don’t 500 the request).
+    """
+    try:
+        from email_utils import send_admin_email, send_customer_email  # your own module
+    except Exception as e:
+        log.warning("Email not sent (email_utils import/config issue): %s", e)
+        return
 
-# ---------- routes ----------
-@app.route("/")
-def root():
-    # Let static serve index.html from project root
-    return send_from_directory(STATIC_DIR, "index.html")
+    try:
+        send_admin_email(payload, attachments=attachments)
+    except Exception as e:
+        log.warning("Failed sending admin email: %s", e)
 
+    try:
+        send_customer_email(payload)
+    except Exception as e:
+        log.warning("Failed sending customer confirmation: %s", e)
+
+# ---------- Helpers ----------
+ALLOWED_EXT = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".heif"}
+def allowed_ext(filename: str) -> bool:
+    return Path(filename).suffix.lower() in ALLOWED_EXT
+
+# ---------- Quote endpoint ----------
 @app.post("/quote")
 def quote():
-    # fields
-    name = (request.form.get("name") or "").strip()
-    email = (request.form.get("email") or "").strip()
-    phone = (request.form.get("phone") or "").strip()
+    # Basic form fields
+    name    = (request.form.get("name") or "").strip()
+    email   = (request.form.get("email") or "").strip()
+    phone   = (request.form.get("phone") or "").strip()
     details = (request.form.get("details") or "").strip()
 
-    # basic validation
     if not name or not email:
-        # send them back to form; you could render a message instead
-        return redirect("/index.html#quote")
+        log.info("Missing required fields: name=%r email=%r", name, email)
+        return "Name and email are required.", 400
 
-    # store uploaded images
-    saved_files = []
-    files = request.files.getlist("images")
-    if files:
-        files = files[:MAX_FILES]
-        date_folder = dt.datetime.utcnow().strftime("%Y-%m-%d")
-        folder = UPLOAD_DIR / date_folder
-        folder.mkdir(parents=True, exist_ok=True)
-
-        for f in files:
+    # Save attachments (input name 'attachments' in your form)
+    saved_paths = []
+    try:
+        files = request.files.getlist("attachments")
+        for f in files or []:
             if not f or not f.filename:
                 continue
-            if not allowed(f.filename):
+            if not allowed_ext(f.filename):
+                log.info("Skipping file with disallowed extension: %s", f.filename)
                 continue
-            ext = f.filename.rsplit(".", 1)[-1].lower()
-            stamp = dt.datetime.utcnow().strftime("%Y%m%d-%H%M%S-%f")
-            safe_name = f"{stamp}.{ext}"
-            path = folder / safe_name
-            f.save(path)
-            # relative path so admin page can display
-            rel = f"/static/uploads/{date_folder}/{safe_name}"
-            saved_files.append(rel)
-
-    # write to DB
-    insert_quote(name, email, phone, details, saved_files)
-
-    # also append to JSON log for admin-quotes.html
-    try:
-        JSON_LOG.parent.mkdir(parents=True, exist_ok=True)
-        existing = []
-        if JSON_LOG.exists():
-            existing = json.loads(JSON_LOG.read_text(encoding="utf-8"))
-        entry = {
-            "id": int(dt.datetime.utcnow().timestamp()),
-            "name": name, "email": email, "phone": phone,
-            "details": details, "files": saved_files,
-            "created_at": dt.datetime.utcnow().isoformat()
-        }
-        existing.insert(0, entry)  # newest first
-        JSON_LOG.write_text(json.dumps(existing[:1000], indent=2), encoding="utf-8")
+            safe_name = secure_filename(f.filename)
+            # prefix timestamp to avoid collisions
+            dest = UPLOAD_DIR / f"{int(datetime.datetime.utcnow().timestamp())}_{safe_name}"
+            f.save(dest)
+            saved_paths.append(str(dest.relative_to(BASE_DIR)))
     except Exception as e:
-        print("Failed to update quotes.json:", e)
+        # Don’t fail the request if file handling hiccups; just log it
+        log.warning("File upload save failed: %s", e)
 
-    # TODO: hook up real emails here if desired
-    # from email_utils import send_admin_email, send_customer_email
-    # send_admin_email(entry)
-    # send_customer_email(entry)
+    # Store in DB (always works even if email fails)
+    try:
+        save_quote(name, email, phone, details, saved_paths)
+    except Exception as e:
+        log.error("DB error when saving quote: %s", e, exc_info=True)
+        return "Server error (db).", 500
 
-    # redirect to thank-you page
-    return redirect("/thank-you.html")
+    # Fire-and-forget emails (log warning if not configured)
+    payload = {"name": name, "email": email, "phone": phone, "details": details}
+    try_send_emails(payload, attachments=[BASE_DIR / p for p in saved_paths])
 
-@app.get("/admin/quotes.json")
-def admin_quotes_json():
-    # simple JSON view from SQLite (no auth for now; you can add a token check)
-    return jsonify(read_quotes())
+    # Always redirect to thank-you page (static file in repo root)
+    return redirect("/thank-you.html", code=303)
 
-# Optional: clear JSON log (protect with env token)
-@app.post("/admin/clear-json")
-def clear_json():
-    token = request.args.get("token", "")
-    if token != os.environ.get("ADMIN_CLEAR_TOKEN", ""):
-        return abort(403)
-    JSON_LOG.write_text("[]", encoding="utf-8")
-    return jsonify({"ok": True})
 
-# Serve thank-you explicitly if needed
-@app.get("/thank-you.html")
-def thankyou():
-    return send_from_directory(STATIC_DIR, "thank-you.html")
-
+# For local dev: python app.py
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
