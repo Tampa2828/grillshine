@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Global Styles -->
-  <link rel="stylesheet" href="assets/styles.css?v=8" />
+  <!-- Global Styles (absolute path so it loads under /admin) -->
+  <link rel="stylesheet" href="/assets/styles.css?v=8" />
 
   <style>
     .hidden { display: none !important; }
@@ -34,7 +34,8 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+    <!-- Absolute link so it works from /admin -->
+    <a class="brand" href="/index.html#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
@@ -47,13 +48,13 @@
       <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
     </div>
     <ul>
-      <li><a href="index.html#top"      class="nav-link">Home</a></li>
-      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
-      <li><a href="index.html#services" class="nav-link">Services</a></li>
-      <li><a href="about.html"          class="nav-link">About</a></li>
-      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
-      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+      <li><a href="/index.html#top"      class="nav-link">Home</a></li>
+      <li><a href="/index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="/index.html#services" class="nav-link">Services</a></li>
+      <li><a href="/about.html"          class="nav-link">About</a></li>
+      <li><a href="/before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="/faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="/index.html#contact"  class="nav-link">Contact</a></li>
     </ul>
     <div class="nav-cta">
       <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
@@ -92,7 +93,7 @@
 
         <div class="admin-actions">
           <button class="btn btn-primary" id="admin-submit" type="submit">Sign In</button>
-          <a class="btn btn-ghost" href="index.html#top">Back to site</a>
+          <a class="btn btn-ghost" href="/index.html#top">Back to site</a>
         </div>
 
         <p class="hint" style="margin-top:12px">
@@ -102,12 +103,12 @@
       </form>
     </section>
 
-    <!-- Fallback panel (you’ll rarely see this—auto-redirect goes to quotes) -->
+    <!-- Fallback panel (auto-redirect goes to quotes) -->
     <section id="admin-panel" class="admin-card hidden" aria-hidden="true">
       <h2>Welcome, Admin</h2>
       <p>You’re signed in (client-side session).</p>
       <div class="admin-actions" style="margin-top:10px">
-        <a class="btn btn-primary" href="admin-quotes.html">Go to Quotes</a>
+        <a class="btn btn-primary" href="/admin/quotes">Go to Quotes</a>
         <button class="btn btn-outline" id="admin-signout" type="button">Sign out</button>
       </div>
       <p class="hint">Front-end only. In production we’ll move to server sessions/tokens.</p>
@@ -118,12 +119,12 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared drawer/smooth-scroll script -->
-  <script src="assets/script.js?v=14"></script>
+  <!-- Shared drawer/smooth-scroll script (absolute path) -->
+  <script src="/assets/script.js?v=14"></script>
 
   <!-- Inline gate logic -->
   <script>
-    // Year
+    // Footer year
     (document.getElementById('year')||{}).textContent = new Date().getFullYear();
 
     // Elements
@@ -137,13 +138,13 @@
     const signOut  = document.getElementById('admin-signout');
 
     // Config
-    const USERNAME = 'admin';
-    const PASSWORD = 'password123';
+    const USERNAME   = 'admin';
+    const PASSWORD   = 'password123';
     const PASSPHRASE = 'admin password123';
-    const QUOTES_URL = 'admin-quotes.html';
+    const QUOTES_URL = '/admin/quotes';   // absolute route handled by Flask
 
-    // Keys used across pages
-    const LOCAL_KEYS = ['gs_admin_signed_in','isAdminSignedIn'];
+    // Storage keys used across pages
+    const LOCAL_KEYS  = ['gs_admin_signed_in','isAdminSignedIn'];
     const SESSION_KEY = 'gs_admin_logged_in';
 
     const isAuthed = () => {
