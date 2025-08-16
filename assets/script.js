@@ -15,13 +15,14 @@ const backdrop = document.getElementById('backdrop');
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // --- CAPTURE-PHASE SHIELD ---
-// If any legacy code is doing document.addEventListener('click', closeDrawer),
-// this prevents those handlers from seeing clicks that start inside the drawer.
+// Prevent any legacy "document click closes nav" listeners from seeing clicks that START inside the drawer.
 window.addEventListener('click', (e) => {
-  if (drawer?.classList.contains('open') && drawer.contains(e.target)) {
-    e.stopPropagation();
-    e.stopImmediatePropagation?.();
-  }
+  if (!drawer?.classList.contains('open')) return;
+  if (!drawer.contains(e.target)) return;
+  // Allow opting out for specific UI parts inside drawer
+  if (e.target.closest('[data-no-close]')) return;
+  e.stopPropagation();
+  e.stopImmediatePropagation?.();
 }, true); // capture = true
 
 // Also stop bubbling inside the drawer for good measure
@@ -44,7 +45,11 @@ function getFocusable(container) {
   return container
     ? Array.from(container.querySelectorAll(
         'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
-      )).filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
+      )).filter(el =>
+        !el.hasAttribute('disabled') &&
+        el.getAttribute('aria-hidden') !== 'true' &&
+        el.offsetParent !== null // reasonably visible
+      )
     : [];
 }
 function trapTabKey(e) {
@@ -170,7 +175,7 @@ function adjustForHash() {
   if (!location.hash) return;
   const tgt = document.querySelector(location.hash);
   if (!tgt) return;
-  setTimeout(() => smoothScrollToEl(tgt), 50);
+  setTimeout(() => smoothScrollToEl(tgt), 100); // slightly longer to wait for layout/fonts
 }
 window.addEventListener('load', adjustForHash);
 window.addEventListener('hashchange', adjustForHash);
