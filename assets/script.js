@@ -1,5 +1,5 @@
 // ==============================
-// GrillShine — stable drawer (X / ESC / backdrop close it)
+// GrillShine — robust drawer (Home works across pages; X/ESC/backdrop close)
 // ==============================
 
 // Footer year
@@ -33,7 +33,7 @@ function getFocusable(container) {
       )).filter(el =>
         !el.hasAttribute('disabled') &&
         el.getAttribute('aria-hidden') !== 'true' &&
-        el.offsetParent !== null // reasonably visible
+        el.offsetParent !== null
       )
     : [];
 }
@@ -45,6 +45,17 @@ function trapTabKey(e) {
   const last  = focusables[focusables.length - 1];
   if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
   else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+}
+
+// Path helpers
+function normPath(p) {
+  return p.replace(/\/index\.html$/i, '/').replace(/\/+$/, '/') || '/';
+}
+function isSameDocument(url) {
+  try {
+    const u = new URL(url, location.href);
+    return u.origin === location.origin && normPath(u.pathname) === normPath(location.pathname);
+  } catch { return false; }
 }
 
 // Open / close
@@ -96,11 +107,9 @@ function closeDrawer() {
 toggle?.addEventListener('click', () =>
   drawer?.classList.contains('open') ? closeDrawer() : openDrawer()
 );
-
-// Ensure the ✕ button always closes the drawer
 closeBtn?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); closeDrawer(); });
 
-// Use pointerdown on the BACKDROP only (no “click anywhere”)
+// Close only when clicking the backdrop itself
 backdrop?.addEventListener('pointerdown', (e) => {
   if (e.target === backdrop) closeDrawer();
 });
@@ -110,25 +119,23 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer();
 });
 
-// Single handler for drawer clicks: stop bubbling & handle links
+// Drawer link handling (anchors + cross-page)
 drawer?.addEventListener('click', (e) => {
-  // Don’t let clicks bubble outside the drawer
   e.stopPropagation();
-
   const a = e.target.closest('a');
   if (!a || !drawer.contains(a)) return;
 
   const href = a.getAttribute('href') || '';
+  if (!href) return;
+
   const targetBlank = a.getAttribute('target') === '_blank';
   const modified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button === 1;
+  if (targetBlank || modified) return;
 
-  if (!href || targetBlank || modified) return;
-
-  // Same-page anchors (e.g., #services or index.html#services)
-  const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
-  if (isSamePageHash) {
+  // 1) Pure hash on current page
+  if (href.startsWith('#')) {
     e.preventDefault();
-    const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
+    const selector = href;
     closeDrawer();
     requestAnimationFrame(() => {
       const el = document.querySelector(selector);
@@ -138,13 +145,29 @@ drawer?.addEventListener('click', (e) => {
     return;
   }
 
-  // Cross-page links
+  // 2) Same document link (incl. index.html#... when already on index)
+  if (isSameDocument(href)) {
+    const u = new URL(href, location.href);
+    if (u.hash) {
+      e.preventDefault();
+      closeDrawer();
+      requestAnimationFrame(() => {
+        const el = document.querySelector(u.hash);
+        if (el) smoothScrollToEl(el);
+        else window.location.hash = u.hash;
+      });
+      return;
+    }
+    // no hash: fall through to navigate (rare)
+  }
+
+  // 3) Different page: navigate
   e.preventDefault();
   closeDrawer();
   setTimeout(() => { window.location.assign(href); }, 100);
 });
 
-// Also prevent pointerdown inside drawer from starting outside-close logic on some setups
+// Prevent pointerdown inside drawer from triggering outside logic
 drawer?.addEventListener('pointerdown', (e) => e.stopPropagation());
 
 // Smooth scrolling for in-page links OUTSIDE the drawer
@@ -154,9 +177,7 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     const hash = anchor.getAttribute('href');
     if (!hash || hash === '#') return;
     const target = document.querySelector(hash);
-    if (!target) return;
-    e.preventDefault();
-    smoothScrollToEl(target);
+    if (target) { e.preventDefault(); smoothScrollToEl(target); }
   });
 });
 
@@ -164,17 +185,15 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 function adjustForHash() {
   if (!location.hash) return;
   const tgt = document.querySelector(location.hash);
-  if (!tgt) return;
-  setTimeout(() => smoothScrollToEl(tgt), 100); // wait for layout/fonts
+  if (tgt) setTimeout(() => smoothScrollToEl(tgt), 100);
 }
 window.addEventListener('load', adjustForHash);
 window.addEventListener('hashchange', adjustForHash);
 
-// Close drawer on resize (safety)
+// Safety: close on resize
 let resizeTimer = null;
 window.addEventListener('resize', () => {
   if (!drawer?.classList.contains('open')) return;
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(closeDrawer, 120);
 });
-

@@ -10,42 +10,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="assets/styles.css?v=7" />
+  <!-- Styles (bump version to refresh) -->
+  <link rel="stylesheet" href="assets/styles.css?v=8" />
 </head>
 <body>
+  <!-- Sticky header -->
   <header class="site-header">
-    <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand -->
-    <a class="brand" href="index.html" aria-label="GrillShine Home">
-      <img src="assets/img/logo.png" alt="GrillShine Logo" class="brand-logo">
+    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+      <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
-
-    <!-- Nav Drawer -->
-    <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <div class="drawer-head">
-        <span class="drawer-title">Menu</span>
-        <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
-      </div>
-      <ul>
-        <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
-        <li><a href="index.html#services" class="nav-link">Services</a></li>
-        <li><a href="about.html"          class="nav-link">About</a></li>
-        <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
-        <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-        <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
-      </div>
-    </nav>
   </header>
 
+  <!-- Drawer & backdrop OUTSIDE header (prevents see-through and click issues) -->
+  <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="drawer-title">Menu</span>
+      <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+    </div>
+    <ul>
+      <li><a href="index.html#top"      class="nav-link">Home</a></li>
+      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="about.html"          class="nav-link">About</a></li>
+      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
+    </div>
+  </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main class="section">
@@ -59,124 +58,7 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Inline JS: Hamburger + Accessibility -->
-  <script>
-    // Dynamic year
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-    const toggle   = document.getElementById('menuToggle');
-    const drawer   = document.getElementById('siteNav');
-    const closeBtn = document.getElementById('closeMenu');
-    const backdrop = document.getElementById('backdrop');
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    function headerOffsetPx() {
-      const header = document.querySelector('.site-header');
-      return header ? header.offsetHeight + 12 : 0;
-    }
-    function smoothScrollToEl(el) {
-      const y = el.getBoundingClientRect().top + window.pageYOffset - headerOffsetPx();
-      window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
-    }
-
-    let lastFocusedBeforeDrawer = null;
-    function getFocusable(container) {
-      return container
-        ? Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'))
-          .filter(el => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true')
-        : [];
-    }
-    function trapTabKey(e) {
-      if (!drawer?.classList.contains('open') || e.key !== 'Tab') return;
-      const focusables = getFocusable(drawer);
-      if (!focusables.length) return;
-      const first = focusables[0];
-      const last  = focusables[focusables.length - 1];
-      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-    }
-
-    const originalOverflow = document.body.style.overflow || '';
-
-    function openDrawer() {
-      lastFocusedBeforeDrawer = document.activeElement;
-      drawer.classList.add('open');
-      backdrop.hidden = false;
-      requestAnimationFrame(() => backdrop.classList.add('show'));
-      toggle.setAttribute('aria-expanded', 'true');
-      drawer.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-      const first = getFocusable(drawer)[0];
-      if (first) first.focus();
-      document.addEventListener('keydown', trapTabKey);
-    }
-
-    function closeDrawer() {
-      drawer.classList.remove('open');
-      backdrop.classList.remove('show');
-      setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-      toggle.setAttribute('aria-expanded', 'false');
-      drawer.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = originalOverflow;
-      (lastFocusedBeforeDrawer || toggle).focus();
-      document.removeEventListener('keydown', trapTabKey);
-    }
-
-    toggle.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    closeBtn.addEventListener('click', closeDrawer);
-    backdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer(); });
-
-    drawer.addEventListener('click', (e) => e.stopPropagation());
-
-    drawer.addEventListener('click', (e) => {
-      const a = e.target.closest('a');
-      if (!a) return;
-      const href = a.getAttribute('href') || '';
-      if (!href) return;
-      const isSamePageHash = href.startsWith('#') || /^index\.html#/.test(href);
-      if (isSamePageHash) {
-        e.preventDefault();
-        const selector = href.startsWith('#') ? href : href.replace(/^index\.html/, '');
-        closeDrawer();
-        requestAnimationFrame(() => {
-          const el = document.querySelector(selector);
-          if (el) smoothScrollToEl(el);
-          else window.location.hash = selector;
-        });
-        return;
-      }
-      e.preventDefault();
-      closeDrawer();
-      setTimeout(() => { window.location.assign(href); }, 80);
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-      if (anchor.closest('#siteNav')) return;
-      anchor.addEventListener('click', (e) => {
-        const hash = anchor.getAttribute('href');
-        const target = document.querySelector(hash);
-        if (target) { e.preventDefault(); smoothScrollToEl(target); }
-      });
-    });
-
-    function adjustForHash() {
-      if (!location.hash) return;
-      const tgt = document.querySelector(location.hash);
-      if (tgt) setTimeout(() => smoothScrollToEl(tgt), 50);
-    }
-    window.addEventListener('load', adjustForHash);
-    window.addEventListener('hashchange', adjustForHash);
-
-    let resizeTimer;
-    window.addEventListener('resize', () => {
-      if (!drawer.classList.contains('open')) return;
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(closeDrawer, 120);
-    });
-  </script>
+  <!-- Shared JS (drawer logic) — bump version to refresh -->
+  <script src="assets/script.js?v=14"></script>
 </body>
 </html>
-
