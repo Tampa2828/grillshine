@@ -10,11 +10,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Global Styles (v=8 includes subpage banner `.page-hero`) -->
+  <!-- Global Styles (v=8 includes .page-hero for subpage banners) -->
   <link rel="stylesheet" href="assets/styles.css?v=8" />
 
-  <!-- Page-scoped styles (About only) -->
+  <!-- Page-scoped: use a different banner image on About only -->
   <style>
+    /* Uses the same page-hero shell, just swaps the background image for About */
+    .page-hero--about::before {
+      background-image: url("assets/img/about-hero.jpg?v=1");
+    }
+
+    /* About-specific layout bits */
     .about-wrap { max-width: 1100px; margin: 0 auto; }
     .about-hero {
       display: grid; gap: 22px; align-items: center;
@@ -84,7 +90,7 @@
     </a>
   </header>
 
-  <!-- Drawer & backdrop OUTSIDE header -->
+  <!-- Drawer & backdrop OUTSIDE header (prevents see-through/click issues) -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -105,11 +111,11 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Subpage banner (uses same Tampa photo bg via CSS) -->
-  <section class="page-hero page-hero--sm">
+  <!-- Subpage banner (About-specific background via .page-hero--about) -->
+  <section class="page-hero page-hero--sm page-hero--about">
     <div class="inner">
       <h1>About GrillShine</h1>
-      <p class="sub">Locally owned &amp; detail obsessed in Greater Tampa Bay.</p>
+      <p class="sub">Locally owned &amp; detail-obsessed in Greater Tampa Bay.</p>
     </div>
   </section>
 
@@ -141,7 +147,6 @@
         </div>
 
         <aside class="map-card" aria-label="Service area map">
-          <!-- Keep filename lowercase; add cache-busting v=2 -->
           <img src="assets/img/tampa-map.jpg?v=2" alt="Service Area: Tampa Bay" loading="lazy" decoding="async">
           <div class="map-caption">Proudly serving Tampa • St. Pete • Clearwater • Brandon • Wesley Chapel &amp; nearby</div>
         </aside>
@@ -174,8 +179,9 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared drawer/smooth-scroll script (v=14 has robust Home handling & focus trap) -->
+  <!-- Shared drawer/smooth-scroll script (v=14: robust Home handling & focus trap) -->
   <script src="assets/script.js?v=14"></script>
 </body>
 </html>
+
 
