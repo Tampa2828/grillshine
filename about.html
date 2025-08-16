@@ -14,38 +14,39 @@
   <link rel="stylesheet" href="assets/styles.css?v=7" />
 </head>
 <body>
+  <!-- Sticky header -->
   <header class="site-header">
     <!-- Hamburger -->
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand -->
-    <a class="brand" href="index.html" aria-label="GrillShine Home">
-      <img src="assets/img/logo.png" alt="Grill Shine Logo" class="brand-logo">
+    <!-- Brand (consistent markup with index) -->
+    <a class="brand" href="index.html#top" aria-label="GrillShine Home">
+      <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
-
-    <!-- Nav Drawer -->
-    <nav id="siteNav" class="nav-drawer" aria-hidden="true">
-      <div class="drawer-head">
-        <span class="drawer-title">Menu</span>
-        <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
-      </div>
-      <ul>
-        <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
-        <li><a href="index.html#services" class="nav-link">Services</a></li>
-        <li><a href="about.html"          class="nav-link">About</a></li>
-        <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
-        <li><a href="faq.html"            class="nav-link">FAQ</a></li>
-        <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
-      </ul>
-      <div class="nav-cta">
-        <a class="btn btn-outline" href="tel:+1-555-123-4567">Call: (555) 123-4567</a>
-      </div>
-    </nav>
   </header>
 
+  <!-- Drawer and backdrop OUTSIDE header -->
+  <nav id="siteNav" class="nav-drawer" aria-hidden="true">
+    <div class="drawer-head">
+      <span class="drawer-title">Menu</span>
+      <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
+    </div>
+    <ul>
+      <li><a href="index.html#top"      class="nav-link">Home</a></li>
+      <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="index.html#services" class="nav-link">Services</a></li>
+      <li><a href="about.html"          class="nav-link">About</a></li>
+      <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
+      <li><a href="faq.html"            class="nav-link">FAQ</a></li>
+      <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
+    </div>
+  </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
   <main class="section">

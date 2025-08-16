@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="assets/styles.css?v=7" />
 </head>
 <body>
-  <!-- Sticky header: hamburger + brand only -->
+  <!-- Sticky header -->
   <header class="site-header">
     <button id="menuToggle" class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
@@ -26,7 +26,7 @@
     </a>
   </header>
 
-  <!-- Drawer and backdrop OUTSIDE header (crucial for z-index / click behavior) -->
+  <!-- Drawer Navigation -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -46,6 +46,7 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
+  <!-- Main Content -->
   <main class="section">
     <h2>Frequently Asked Questions</h2>
     <p>We’re writing this up. In the meantime, contact us and we’ll answer right away.</p>
@@ -53,20 +54,20 @@
          style="max-width:680px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)">
   </main>
 
+  <!-- Footer -->
   <footer class="site-footer">
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Inline JS: Drawer / Hamburger -->
+  <!-- Drawer + Smooth Scroll Script -->
   <script>
-    const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
 
     const toggle   = document.getElementById('menuToggle');
     const drawer   = document.getElementById('siteNav');
     const closeBtn = document.getElementById('closeMenu');
     const backdrop = document.getElementById('backdrop');
-
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function headerOffsetPx() {
@@ -78,7 +79,7 @@
       window.scrollTo({ top: y, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
     }
 
-    let lastFocusedBeforeDrawer = null;
+    let lastFocused = null;
     function getFocusable(container) {
       return container
         ? Array.from(container.querySelectorAll('a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'))
@@ -86,7 +87,7 @@
         : [];
     }
     function trapTabKey(e) {
-      if (!drawer?.classList.contains('open') || e.key !== 'Tab') return;
+      if (!drawer.classList.contains('open') || e.key !== 'Tab') return;
       const focusables = getFocusable(drawer);
       if (!focusables.length) return;
       const first = focusables[0];
@@ -98,39 +99,35 @@
     const originalOverflow = document.body.style.overflow || '';
 
     function openDrawer() {
-      lastFocusedBeforeDrawer = document.activeElement;
+      lastFocused = document.activeElement;
       drawer.classList.add('open');
       backdrop.hidden = false;
       requestAnimationFrame(() => backdrop.classList.add('show'));
-      toggle?.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-expanded', 'true');
       drawer.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       const first = getFocusable(drawer)[0];
       if (first) first.focus();
       document.addEventListener('keydown', trapTabKey);
     }
-
     function closeDrawer() {
       drawer.classList.remove('open');
       backdrop.classList.remove('show');
       setTimeout(() => { if (!drawer.classList.contains('open')) backdrop.hidden = true; }, 200);
-      toggle?.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-expanded', 'false');
       drawer.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = originalOverflow;
-      (lastFocusedBeforeDrawer || toggle)?.focus();
+      (lastFocused || toggle).focus();
       document.removeEventListener('keydown', trapTabKey);
     }
 
-    toggle?.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
-    closeBtn?.addEventListener('click', closeDrawer);
-    backdrop?.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer?.classList.contains('open')) closeDrawer(); });
+    toggle.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+    closeBtn.addEventListener('click', closeDrawer);
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) closeDrawer(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer(); });
 
-    // Keep clicks inside the drawer from closing it
-    drawer?.addEventListener('click', (e) => e.stopPropagation());
-
-    // Drawer link handling (hash + cross-page)
-    drawer?.addEventListener('click', (e) => {
+    // Drawer links
+    drawer.addEventListener('click', (e) => {
       const a = e.target.closest('a');
       if (!a) return;
       const href = a.getAttribute('href') || '';
@@ -143,23 +140,20 @@
         closeDrawer();
         requestAnimationFrame(() => {
           const el = document.querySelector(selector);
-          if (el) smoothScrollToEl(el);
-          else window.location.hash = selector;
+          if (el) smoothScrollToEl(el); else window.location.hash = selector;
         });
         return;
       }
-
       e.preventDefault();
       closeDrawer();
       setTimeout(() => { window.location.assign(href); }, 80);
     });
 
-    // Smooth scroll for non-drawer hash links
+    // Smooth scroll outside drawer
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       if (anchor.closest('#siteNav')) return;
       anchor.addEventListener('click', (e) => {
-        const hash = anchor.getAttribute('href');
-        const target = document.querySelector(hash);
+        const target = document.querySelector(anchor.getAttribute('href'));
         if (target) { e.preventDefault(); smoothScrollToEl(target); }
       });
     });
@@ -172,14 +166,13 @@
     window.addEventListener('load', adjustForHash);
     window.addEventListener('hashchange', adjustForHash);
 
-    // Safety: close on resize
+    // Auto-close on resize
     let resizeTimer;
     window.addEventListener('resize', () => {
-      if (!drawer?.classList.contains('open')) return;
+      if (!drawer.classList.contains('open')) return;
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(closeDrawer, 120);
     });
   </script>
 </body>
 </html>
-

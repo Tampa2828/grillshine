@@ -40,7 +40,7 @@ select:focus-visible {
   border-radius: 8px;
 }
 
-/* Reset images/videos to be responsive */
+/* Responsive media */
 img, picture, video { max-width: 100%; height: auto; }
 
 /* UTILS */
@@ -71,6 +71,8 @@ img, picture, video { max-width: 100%; height: auto; }
   display: inline-block; width: 28px; height: 28px;
   background: url("assets/img/logo.png") center/contain no-repeat;
 }
+/* Defensive: support pages that used <img class="brand-logo"> */
+img.brand-logo { width: 28px; height: 28px; object-fit: contain; display: inline-block; }
 .brand-text { font-size: 18px; }
 
 /* HAMBURGER */
@@ -84,9 +86,7 @@ img, picture, video { max-width: 100%; height: auto; }
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .hamburger:hover { border-color: var(--accent); }
-.hamburger:focus-visible {
-  box-shadow: 0 0 0 3px rgba(255,209,102,.2);
-}
+.hamburger:focus-visible { box-shadow: 0 0 0 3px rgba(255,209,102,.2); }
 .hamburger .bar {
   display: block; width: 20px; height: 2px;
   background: var(--accent); margin: 3px 0; border-radius: 2px;
@@ -95,7 +95,8 @@ img, picture, video { max-width: 100%; height: auto; }
 /* ================= DRAWER ================= */
 .nav-drawer {
   position: fixed; inset: 0 auto 0 0; width: 280px;
-  background: var(--card); box-shadow: var(--shadow);
+  background: var(--card) !important; /* ensure not see-through */
+  box-shadow: var(--shadow);
   transform: translateX(-100%);
   transition: transform .28s ease;
   padding: 20px; z-index: 1001;
@@ -305,3 +306,4 @@ img, picture, video { max-width: 100%; height: auto; }
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; scroll-behavior: auto; }
 }
+
