@@ -6,19 +6,18 @@
 
   <title>Grill Shine — Professional BBQ Grill Steam Cleaning in Greater Tampa Bay</title>
   <meta name="description" content="Eco-friendly, on-site BBQ grill steam cleaning across Greater Tampa Bay. We remove grease, residue, and bacteria with high-temperature steam—no harsh chemicals. Book your Grill Shine quote today." />
-  <link rel="canonical" href="https://www.grillshine.com/" />
+  <link rel="canonical" href="https://grillshine.onrender.com/" />
 
-  <!-- Keywords (optional but fine) -->
   <meta name="keywords" content="Grill, Shine, GrillShine, grillshine, grills, clean, steam, stainless steel, stainless, outdoor kitchen, outdoor grill, Tampa, St. Petersburg, Clearwater, Wesley Chapel, Brandon" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="Grill Shine — Professional BBQ Grill Steam Cleaning" />
   <meta property="og:description" content="Eco-friendly, on-site steam cleaning for grills and outdoor kitchens in Greater Tampa Bay." />
-  <meta property="og:url" content="https://www.grillshine.com/" />
+  <meta property="og:url" content="https://grillshine.onrender.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Grill Shine" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="https://www.grillshine.com/assets/img/og.jpg" />
+  <meta property="og:image" content="https://grillshine.onrender.com/assets/img/og.jpg" />
 
   <!-- Favicons -->
   <link rel="icon" href="assets/favicon.ico" sizes="any">
@@ -31,7 +30,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="assets/styles.css?v=7" />
+  <link rel="stylesheet" href="assets/styles.css?v=8" />
 
   <style>
     /* HERO background + typography */
@@ -62,7 +61,6 @@
     }
     .hero .hero-content { position: relative; z-index: 1; }
 
-    /* Two-line heading (brand + short tagline) */
     .hero h1{
       margin: 0 0 10px;
       display: flex;
@@ -139,7 +137,7 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <a class="brand" href="#top" aria-label="Grill Shine Home">
+    <a class="brand" href="index.html#top" aria-label="Grill Shine Home">
       <span class="brand-logo"></span>
       <span class="brand-text">GrillShine</span>
     </a>
@@ -161,7 +159,6 @@
       <li><a href="index.html#contact"  class="nav-link">Contact</a></li>
     </ul>
     <div class="nav-cta">
-      <!-- TODO: replace with real number -->
       <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
     </div>
   </nav>
@@ -213,8 +210,21 @@
       <h2>Get a Fast Quote</h2>
       <p>Tell us about your grill (brand/model, size, and last clean) and your location. Add photos to speed things up.</p>
 
-      <!-- enctype needed for image uploads -->
-      <form id="quoteForm" class="quote-form" action="/quote" method="POST" enctype="multipart/form-data" autocomplete="on" novalidate>
+      <!-- FormSubmit: simple email + redirect to thank-you.html -->
+      <form id="quoteForm"
+            class="quote-form"
+            action="https://formsubmit.co/hayes@grillshine.com"
+            method="POST"
+            enctype="multipart/form-data"
+            target="_self">
+
+        <!-- Redirect after submit -->
+        <input type="hidden" name="_next" value="https://grillshine.onrender.com/thank-you.html" />
+        <!-- Optional tweaks -->
+        <input type="hidden" name="_captcha" value="false" />
+        <input type="hidden" name="_subject" value="New GrillShine Quote" />
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+
         <div class="form-row">
           <label for="name">Name</label>
           <input id="name" name="name" type="text" placeholder="Your name" required />
@@ -239,8 +249,8 @@
 
         <div class="form-row">
           <label for="images">Upload Photos (optional)</label>
-          <input id="images" name="images" type="file" accept="image/*" multiple aria-describedby="images-help" />
-          <small id="images-help" class="help">You can select multiple images. Clear, well-lit photos help us quote faster. Max total ~16MB.</small>
+          <input id="images" name="attachments" type="file" accept="image/*" multiple aria-describedby="images-help" />
+          <small id="images-help" class="help">You can select multiple images. Clear, well-lit photos help us quote faster.</small>
         </div>
 
         <button type="submit" class="btn btn-primary">Request Quote</button>
@@ -269,7 +279,7 @@
       <h2>Contact</h2>
       <ul class="contact-list">
         <li><a href="mailto:hayes@grillshine.com">Email: hayes@grillshine.com</a></li>
-        <li><a href="https://www.grillshine.com" target="_blank" rel="noopener">Website: grillshine.com</a></li>
+        <li><a href="https://grillshine.onrender.com" target="_blank" rel="noopener">Website: grillshine.onrender.com</a></li>
         <li><a href="tel:+1-813-555-0199">Call: (813) 555-0199</a></li>
       </ul>
     </section>
@@ -285,8 +295,8 @@
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Grill Shine",
-    "image": "https://www.grillshine.com/assets/img/og.jpg",
-    "url": "https://www.grillshine.com/",
+    "image": "https://grillshine.onrender.com/assets/img/og.jpg",
+    "url": "https://grillshine.onrender.com/",
     "telephone": "+1-813-555-0199",
     "email": "hayes@grillshine.com",
     "description": "Professional, eco-friendly BBQ grill steam cleaning across Greater Tampa Bay. We remove grease, residue, and bacteria without harsh chemicals—right at your home.",
@@ -299,14 +309,12 @@
       "addressCountry": "US"
     },
     "priceRange": "$$",
-    "sameAs": ["https://www.grillshine.com/"],
+    "sameAs": ["https://grillshine.onrender.com/"],
     "keywords": "Grill, Shine, GrillShine, grillshine, grills, clean, steam, stainless steel, outdoor kitchen, outdoor grill"
   }
   </script>
 
   <!-- Shared JS (drawer, smooth scroll, footer year) -->
-  <script src="assets/script.js?v=10"></script>
+  <script src="assets/script.js?v=14"></script>
 </body>
 </html>
-
-
