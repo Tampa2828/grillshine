@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Admin — GrillShine</title>
 
+  <!-- Make all relative links resolve from site root -->
+  <base href="/" />
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Montserrat:wght@500;800&display=swap" rel="stylesheet" />
 
-  <!-- Global Styles (absolute path so it loads under /admin) -->
+  <!-- Global Styles -->
   <link rel="stylesheet" href="/assets/styles.css?v=8" />
 
   <style>
@@ -34,8 +37,7 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Absolute link so it works from /admin -->
-    <a class="brand" href="/index.html#top" aria-label="GrillShine Home">
+    <a class="brand" href="/#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
     </a>
@@ -48,13 +50,13 @@
       <button id="closeMenu" class="close-btn" aria-label="Close menu">✕</button>
     </div>
     <ul>
-      <li><a href="/index.html#top"      class="nav-link">Home</a></li>
-      <li><a href="/index.html#quote"    class="nav-link">Get a Quote</a></li>
-      <li><a href="/index.html#services" class="nav-link">Services</a></li>
+      <li><a href="/#top"      class="nav-link">Home</a></li>
+      <li><a href="/#quote"    class="nav-link">Get a Quote</a></li>
+      <li><a href="/#services" class="nav-link">Services</a></li>
       <li><a href="/about.html"          class="nav-link">About</a></li>
       <li><a href="/before-after.html"   class="nav-link">Before &amp; After</a></li>
       <li><a href="/faq.html"            class="nav-link">FAQ</a></li>
-      <li><a href="/index.html#contact"  class="nav-link">Contact</a></li>
+      <li><a href="/#contact"            class="nav-link">Contact</a></li>
     </ul>
     <div class="nav-cta">
       <a class="btn btn-outline" href="tel:+1-813-555-0199">Call: (813) 555-0199</a>
@@ -93,7 +95,7 @@
 
         <div class="admin-actions">
           <button class="btn btn-primary" id="admin-submit" type="submit">Sign In</button>
-          <a class="btn btn-ghost" href="/index.html#top">Back to site</a>
+          <a class="btn btn-ghost" href="/#top">Back to site</a>
         </div>
 
         <p class="hint" style="margin-top:12px">
@@ -102,48 +104,28 @@
         </p>
       </form>
     </section>
-
-    <!-- Fallback panel (auto-redirect goes to quotes) -->
-    <section id="admin-panel" class="admin-card hidden" aria-hidden="true">
-      <h2>Welcome, Admin</h2>
-      <p>You’re signed in (client-side session).</p>
-      <div class="admin-actions" style="margin-top:10px">
-        <a class="btn btn-primary" href="/admin/quotes">Go to Quotes</a>
-        <button class="btn btn-outline" id="admin-signout" type="button">Sign out</button>
-      </div>
-      <p class="hint">Front-end only. In production we’ll move to server sessions/tokens.</p>
-    </section>
   </main>
 
   <footer class="site-footer">
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared drawer/smooth-scroll script (absolute path) -->
   <script src="/assets/script.js?v=14"></script>
 
-  <!-- Inline gate logic -->
   <script>
-    // Footer year
     (document.getElementById('year')||{}).textContent = new Date().getFullYear();
 
-    // Elements
-    const form     = document.getElementById('admin-form');
-    const userEl   = document.getElementById('admin-user');
-    const passEl   = document.getElementById('admin-pass');
-    const msgEl    = document.getElementById('admin-msg');
-    const showEl   = document.getElementById('showpass');
-    const gate     = document.getElementById('admin-gate');
-    const panel    = document.getElementById('admin-panel');
-    const signOut  = document.getElementById('admin-signout');
+    const form   = document.getElementById('admin-form');
+    const userEl = document.getElementById('admin-user');
+    const passEl = document.getElementById('admin-pass');
+    const msgEl  = document.getElementById('admin-msg');
+    const showEl = document.getElementById('showpass');
 
-    // Config
     const USERNAME   = 'admin';
     const PASSWORD   = 'password123';
     const PASSPHRASE = 'admin password123';
-    const QUOTES_URL = '/admin/quotes';   // absolute route handled by Flask
+    const QUOTES_URL = '/admin/quotes';      // <— go straight to the inbox
 
-    // Storage keys used across pages
     const LOCAL_KEYS  = ['gs_admin_signed_in','isAdminSignedIn'];
     const SESSION_KEY = 'gs_admin_logged_in';
 
@@ -154,7 +136,7 @@
         return local || sess;
       } catch (_) { return false; }
     };
-    const setAuthed = (v) => {
+    const setAuthed = v => {
       try {
         if (v) {
           LOCAL_KEYS.forEach(k => localStorage.setItem(k,'1'));
@@ -163,61 +145,31 @@
           LOCAL_KEYS.forEach(k => localStorage.removeItem(k));
           sessionStorage.removeItem(SESSION_KEY);
         }
-      } catch (_) {}
+      } catch(_) {}
     };
 
-    // If already signed in, go straight to quotes
-    if (isAuthed()) {
-      window.location.replace(QUOTES_URL);
-    }
+    if (isAuthed()) { window.location.replace(QUOTES_URL); }
 
-    // Toggle password visibility
     showEl?.addEventListener('change', () => {
       passEl.type = showEl.checked ? 'text' : 'password';
       passEl.focus();
     });
 
-    function showError(text){ if (msgEl) msgEl.textContent = text; }
-    function showPanel(){
-      gate.classList.add('hidden');
-      panel.classList.remove('hidden');
-      panel.setAttribute('aria-hidden','false');
-    }
-    function showGate(){
-      panel.classList.add('hidden');
-      panel.setAttribute('aria-hidden','true');
-      gate.classList.remove('hidden');
-      userEl.focus();
-    }
-
-    // Handle submit
     form?.addEventListener('submit', (e) => {
       e.preventDefault();
       const u = (userEl.value || '').trim().toLowerCase();
       const p = (passEl.value || '').trim();
 
-      const okUser = !u || u === USERNAME; // username optional; if provided must be "admin"
+      const okUser = !u || u === USERNAME;
       const okPass = p === PASSWORD || p.toLowerCase() === PASSPHRASE;
 
       if (okUser && okPass) {
         setAuthed(true);
-        showError('');
-        // Hard redirect to the quotes inbox
         window.location.assign(QUOTES_URL);
       } else {
-        setAuthed(false);
-        showError('That username or password didn’t look right. Try again.');
+        (msgEl||{}).textContent = 'That username or password didn’t look right. Try again.';
         passEl.focus();
       }
-    });
-
-    // Fallback signout (main signout is on the quotes page)
-    signOut?.addEventListener('click', () => {
-      setAuthed(false);
-      passEl.value = '';
-      showError('');
-      showGate();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>
