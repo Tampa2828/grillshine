@@ -6,18 +6,18 @@
 
   <title>Grill Shine — Professional BBQ Grill Steam Cleaning in Greater Tampa Bay</title>
   <meta name="description" content="Eco-friendly, on-site BBQ grill steam cleaning across Greater Tampa Bay. We remove grease, residue, and bacteria with high-temperature steam—no harsh chemicals. Book your Grill Shine quote today." />
-  <link rel="canonical" href="https://grillshine.onrender.com/" />
+  <link rel="canonical" href="https://grillshine.com/" />
 
   <meta name="keywords" content="Grill, Shine, GrillShine, grillshine, grills, clean, steam, stainless steel, stainless, outdoor kitchen, outdoor grill, Tampa, St. Petersburg, Clearwater, Wesley Chapel, Brandon" />
 
   <!-- Open Graph -->
   <meta property="og:title" content="Grill Shine — Professional BBQ Grill Steam Cleaning" />
   <meta property="og:description" content="Eco-friendly, on-site steam cleaning for grills and outdoor kitchens in Greater Tampa Bay." />
-  <meta property="og:url" content="https://grillshine.onrender.com/" />
+  <meta property="og:url" content="https://grillshine.com/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Grill Shine" />
   <meta property="og:locale" content="en_US" />
-  <meta property="og:image" content="https://grillshine.onrender.com/assets/img/og.jpg" />
+  <meta property="og:image" content="https://grillshine.com/assets/img/og.jpg" />
 
   <!-- Favicons -->
   <link rel="icon" href="assets/favicon.ico" sizes="any">
@@ -98,6 +98,26 @@
     #quote{ position: relative; background-color: #111; overflow: hidden; }
     #quote > *{ position: relative; z-index: 1; }
     .help { color: var(--muted); font-size: 14px; margin-top: 6px; display: block; }
+
+    /* CONTACT layout with an hours card */
+    .contact-grid{
+      display:grid; gap:24px;
+      grid-template-columns:1fr;
+    }
+    @media (min-width: 900px){
+      .contact-grid{ grid-template-columns: 1.2fr .8fr; align-items:start; }
+    }
+    .mini-card{
+      background: var(--panel, #151924);
+      border: 1px solid var(--panel-brd, rgba(255,255,255,.10));
+      border-radius: var(--radius, 16px);
+      padding: 18px 20px;
+      box-shadow: var(--shadow, 0 14px 40px rgba(0,0,0,.35));
+    }
+    .hours-card h3{ margin:0 0 10px; }
+    .hours-list{ list-style:none; padding:0; margin:0 0 12px; }
+    .hours-list li{ margin:6px 0; }
+    .btn-sm{ padding:8px 12px; font-size:.9rem; }
   </style>
 </head>
 <body>
@@ -124,7 +144,7 @@
       <li><a href="index.html#quote"    class="nav-link">Get a Quote</a></li>
       <li><a href="index.html#services" class="nav-link">Services</a></li>
       <li><a href="index.html#extras"   class="nav-link">Additional Services</a></li>
-      <li><a href="index.html#hours"    class="nav-link">Hours</a></li>
+      <!-- Removed Hours link to reduce repetition -->
       <li><a href="about.html"          class="nav-link">About</a></li>
       <li><a href="before-after.html"   class="nav-link">Before &amp; After</a></li>
       <li><a href="faq.html"            class="nav-link">FAQ</a></li>
@@ -204,18 +224,6 @@
       </div>
     </section>
 
-    <!-- HOURS -->
-    <section id="hours" class="section">
-      <h2>Hours of Operation</h2>
-      <div class="cards">
-        <article class="card">
-          <p><strong>Monday – Saturday:</strong> 8:00 AM – 8:00 PM</p>
-          <p><strong>Sunday:</strong> Closed</p>
-          <p class="muted">After-hours appointments may be available upon request.</p>
-        </article>
-      </div>
-    </section>
-
     <!-- QUOTE -->
     <section id="quote" class="section section-accent">
       <h2>Get a Fast Quote</h2>
@@ -279,14 +287,30 @@
       </p>
     </section>
 
-    <!-- CONTACT -->
+    <!-- CONTACT (with Hours) -->
     <section id="contact" class="section">
       <h2>Contact</h2>
-      <ul class="contact-list">
-        <li><a href="mailto:hayes@grillshine.com">Email: hayes@grillshine.com</a></li>
-        <li><a href="https://grillshine.onrender.com" target="_blank" rel="noopener">Website: grillshine.com</a></li>
-        <li><a href="tel:+1-813-555-0199">Call: (813) 555-0199</a></li>
-      </ul>
+
+      <div class="contact-grid">
+        <!-- Left: contact info -->
+        <div>
+          <ul class="contact-list">
+            <li><a href="mailto:hayes@grillshine.com">Email: hayes@grillshine.com</a></li>
+            <li><a href="https://grillshine.com" target="_blank" rel="noopener">Website: grillshine.com</a></li>
+            <li><a href="tel:+1-813-555-0199">Call: (813) 555-0199</a></li>
+          </ul>
+        </div>
+
+        <!-- Right: hours card -->
+        <article class="mini-card hours-card">
+          <h3>Hours of Operation</h3>
+          <ul class="hours-list">
+            <li><strong>Mon–Sat:</strong> 8:00 AM – 8:00 PM</li>
+            <li><strong>Sunday:</strong> Closed</li>
+          </ul>
+          <a href="#quote" class="btn btn-outline btn-sm">Request a time</a>
+        </article>
+      </div>
     </section>
   </main>
 
@@ -300,8 +324,8 @@
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Grill Shine",
-    "image": "https://grillshine.onrender.com/assets/img/og.jpg",
-    "url": "https://grillshine.onrender.com/",
+    "image": "https://grillshine.com/assets/img/og.jpg",
+    "url": "https://grillshine.com/",
     "telephone": "+1-813-555-0199",
     "email": "hayes@grillshine.com",
     "description": "Professional, eco-friendly BBQ grill steam cleaning across Greater Tampa Bay. We remove grease, residue, and bacteria without harsh chemicals—right at your home.",
@@ -309,7 +333,7 @@
     "areaServed": ["Tampa","St. Petersburg","Clearwater","Brandon","Wesley Chapel","Greater Tampa Bay"],
     "address": { "@type": "PostalAddress", "addressLocality": "Tampa", "addressRegion": "FL", "addressCountry": "US" },
     "priceRange": "$$",
-    "sameAs": ["https://grillshine.onrender.com/"],
+    "sameAs": ["https://grillshine.com/"],
     "openingHours": ["Mo-Sa 08:00-20:00"],
     "openingHoursSpecification": [{
       "@type": "OpeningHoursSpecification",
@@ -325,3 +349,4 @@
   <script src="assets/script.js?v=14"></script>
 </body>
 </html>
+
