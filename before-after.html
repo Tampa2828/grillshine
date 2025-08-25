@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Before & After — GrillShine</title>
-  <meta name="description" content="Real GrillShine transformations. Side-by-side before and after photos from professional BBQ grill steam cleanings in Greater Tampa Bay." />
+  <title>Before & After Results — GrillShine</title>
+  <meta name="description" content="See real GrillShine transformations. Side-by-side before & after photos from professional BBQ grill steam cleanings in Greater Tampa Bay." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,7 +14,7 @@
   <!-- Global styles -->
   <link rel="stylesheet" href="assets/styles.css?v=8" />
 
-  <!-- Page-local styles for the gallery (optional to move into styles.css later) -->
+  <!-- Page-local styles (badges + gallery polish) -->
   <style>
     .ba-wrap{ width:min(100% - 32px, var(--container)); margin:0 auto }
     .before-after-group{ margin: 28px 0 40px }
@@ -27,24 +27,30 @@
       box-shadow: var(--shadow);
       padding: 16px;
     }
+    .ba-grid{ display:grid; gap:16px; grid-template-columns: 1fr 1fr; }
+    .ba-grid + .ba-grid{ margin-top:14px }
 
-    .ba-grid{
-      display:grid; gap:16px;
-      grid-template-columns: 1fr 1fr;
-    }
-    .ba-grid + .ba-grid{ margin-top:14px } /* spacing between rows for same grill */
-
-    .ba-grid figure{ margin:0; text-align:center }
-    .ba-grid img{
+    .ba-fig{ position:relative; margin:0; text-align:center }
+    .ba-fig img{
       width:100%; height:auto; display:block;
       border-radius: calc(var(--radius) - 4px);
       border:1px solid var(--panel-brd);
       box-shadow: 0 10px 26px rgba(0,0,0,.28);
     }
-    .ba-grid figcaption{
-      margin-top:6px; font-weight:700; color:var(--muted);
+    .ba-fig figcaption{ margin-top:6px; font-weight:700; color:var(--muted) }
+
+    /* BEFORE/AFTER badges */
+    .ba-label{
+      position:absolute; top:8px; left:8px;
+      background:rgba(0,0,0,.6);
+      color:#fff; border:1px solid var(--panel-brd);
+      padding:4px 10px; border-radius:999px;
+      font-weight:800; font-size:.8rem; letter-spacing:.2px;
+      text-transform:uppercase;
     }
+
     .ba-note{ margin-top:10px; color:var(--muted) }
+    .ba-note strong{ color:#eaeef7 }
 
     @media (max-width: 760px){
       .ba-grid{ grid-template-columns:1fr }
@@ -58,7 +64,6 @@
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
 
-    <!-- Brand -->
     <a class="brand" href="index.html#top" aria-label="GrillShine Home">
       <span class="brand-logo" aria-hidden="true"></span>
       <span class="brand-text">GrillShine</span>
@@ -86,13 +91,13 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Subpage banner -->
+  <!-- Top banner -->
   <section class="page-hero page-hero--sm">
     <div class="inner">
-      <h1>Before &amp; After</h1>
-      <p class="sub">Real transformations from grills we’ve restored in Greater Tampa Bay.</p>
+      <h1>Before &amp; After Results</h1>
+      <p class="sub">See what high-temperature steam (no chemicals) does in about 1–2 hours.</p>
       <div class="hero-cta" style="margin-top:14px">
-        <a href="index.html#quote" class="btn btn-primary">Get a Quote</a>
+        <a href="index.html#quote" class="btn btn-primary">Get a Fast Quote</a>
         <a href="tel:+1-813-555-0199" class="btn btn-ghost">Call (813) 555-0199</a>
       </div>
     </div>
@@ -102,96 +107,100 @@
   <main class="section" role="main">
     <div class="ba-wrap">
 
-      <!-- =================== Grill 1 =================== -->
-      <section class="before-after-group" aria-labelledby="grill1">
-        <h3 id="grill1">Grill #1</h3>
+      <!-- ========== Case 1 ========== -->
+      <section class="before-after-group" aria-labelledby="case1">
+        <h3 id="case1">Stainless Exterior + Grates Refresh</h3>
         <article class="ba-card">
           <!-- Row 1 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/1st%20grill/Before1.jpg" alt="Grill #1 before cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/1st%20grill/Before1.jpg" alt="Before — stainless and grates with heavy buildup" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
+              <figcaption>Built-up grease on grates and drip areas.</figcaption>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/1st%20grill/after1.jpg" alt="Grill #1 after steam cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/1st%20grill/after1.jpg" alt="After — stainless and grates restored" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
+              <figcaption>Grates de-carbonized; stainless polished streak-free.</figcaption>
             </figure>
           </div>
           <!-- Row 2 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/1st%20grill/Before2.jpg" alt="Grill #1 before cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/1st%20grill/Before2.jpg" alt="Before — interior walls and heat shields" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/1st%20grill/after2.jpg" alt="Grill #1 after steam cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/1st%20grill/after2.jpg" alt="After — interior walls and heat shields cleaned" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
             </figure>
           </div>
 
-          <p class="ba-note">Deep clean removed carbonized grease; burners and grates restored for even heat.</p>
+          <p class="ba-note"><strong>Result:</strong> Even heat restored and exterior shine brought back — no chemical residue.</p>
         </article>
       </section>
 
-      <!-- =================== Grill 2 =================== -->
-      <section class="before-after-group" aria-labelledby="grill2">
-        <h3 id="grill2">Grill #2</h3>
+      <!-- ========== Case 2 ========== -->
+      <section class="before-after-group" aria-labelledby="case2">
+        <h3 id="case2">Burners &amp; Heat Plates Rescue</h3>
         <article class="ba-card">
           <!-- Row 1 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/2nd%20grill/before1(2).jpg" alt="Grill #2 before cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/2nd%20grill/before1(2).jpg" alt="Before — burners and plates with carbon buildup" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
+              <figcaption>Clogged flame ports and coated heat plates.</figcaption>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/2nd%20grill/after1(2).jpg" alt="Grill #2 after steam cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/2nd%20grill/after1(2).jpg" alt="After — burners cleared and plates cleaned" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
+              <figcaption>Ports cleared; heat distribution noticeably improved.</figcaption>
             </figure>
           </div>
           <!-- Row 2 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/2nd%20grill/before2(2).jpg" alt="Grill #2 before cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/2nd%20grill/before2(2).jpg" alt="Before — additional burner view" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/2nd%20grill/after2(2).jpg" alt="Grill #2 after steam cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/2nd%20grill/after2(2).jpg" alt="After — additional burner view cleaned" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
             </figure>
           </div>
-          <!-- Note: file 'Before3(2).jpg' has no matching 'after3(2).jpg', so we omit it -->
-          <p class="ba-note">Sanitized grates and burners; stainless brightened with a streak-free finish.</p>
+
+          <p class="ba-note"><strong>Result:</strong> Hot spots reduced; consistent, even flame across the cook surface.</p>
         </article>
       </section>
 
-      <!-- =================== Grill 3 =================== -->
-      <section class="before-after-group" aria-labelledby="grill3">
-        <h3 id="grill3">Grill #3</h3>
+      <!-- ========== Case 3 ========== -->
+      <section class="before-after-group" aria-labelledby="case3">
+        <h3 id="case3">Deep Interior Degrease &amp; Sanitize</h3>
         <article class="ba-card">
           <!-- Row 1 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/3rd%20grill/Before1(3).jpg" alt="Grill #3 before cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/3rd%20grill/Before1(3).jpg" alt="Before — interior with heavy residue" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/3rd%20grill/after1(3).jpg" alt="Grill #3 after steam cleaning (view 1)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/3rd%20grill/after1(3).jpg" alt="After — interior steam-sterilized and clean" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
             </figure>
           </div>
           <!-- Row 2 -->
           <div class="ba-grid">
-            <figure>
-              <img src="before%20and%20after%20images/3rd%20grill/Before2(3).jpg" alt="Grill #3 before cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>Before</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/3rd%20grill/Before2(3).jpg" alt="Before — internal walls and components" loading="lazy" decoding="async">
+              <span class="ba-label">Before</span>
             </figure>
-            <figure>
-              <img src="before%20and%20after%20images/3rd%20grill/after2(3).jpg" alt="Grill #3 after steam cleaning (view 2)" loading="lazy" decoding="async">
-              <figcaption>After</figcaption>
+            <figure class="ba-fig">
+              <img src="before%20and%20after%20images/3rd%20grill/after2(3).jpg" alt="After — internal walls and components cleaned" loading="lazy" decoding="async">
+              <span class="ba-label">After</span>
             </figure>
           </div>
-          <!-- Extra 'after3(3).jpg' doesn’t have a matching before, so we skip it to keep pairs clean -->
-          <p class="ba-note">Interior steam-sterilized; heavy buildup lifted for safer, better-tasting cooks.</p>
+
+          <p class="ba-note"><strong>Result:</strong> Interior steam-sterilized; heavy buildup lifted for safer, better-tasting cooks.</p>
         </article>
       </section>
 
