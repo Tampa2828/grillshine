@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FAQ — GrillShine</title>
+  <meta name="description" content="Answers about GrillShine’s eco-friendly BBQ grill steam cleaning: our process, service area, timing, prep, and whether you need to be home." />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,7 +29,7 @@
     </a>
   </header>
 
-  <!-- Drawer & backdrop OUTSIDE header (avoids see-through overlay) -->
+  <!-- Drawer & backdrop -->
   <nav id="siteNav" class="nav-drawer" aria-hidden="true">
     <div class="drawer-head">
       <span class="drawer-title">Menu</span>
@@ -49,11 +50,11 @@
   </nav>
   <div id="backdrop" class="backdrop" hidden></div>
 
-  <!-- Page banner (uses the same Tampa background as the home hero) -->
+  <!-- Page banner -->
   <section class="page-hero page-hero--sm">
     <div class="inner">
       <h1>Frequently Asked Questions</h1>
-      <p class="sub">Quick answers about our eco-friendly BBQ grill steam cleaning.</p>
+      <p class="sub">Quick answers about our eco-friendly BBQ grill cleaning service.</p>
       <div class="hero-cta" style="margin-top:14px">
         <a href="index.html#quote" class="btn btn-primary">Get a Quote</a>
         <a href="tel:+1-813-555-0199" class="btn btn-ghost">Call (813) 555-0199</a>
@@ -63,36 +64,42 @@
 
   <!-- Main Content -->
   <main class="section">
-    <!-- Placeholder until real FAQ copy is ready -->
-    <p>We’re putting the final touches on this page. In the meantime, here are a few quick hits:</p>
-
-    <!-- Accessible, native details/summary accordions -->
     <div class="cards" style="grid-template-columns: 1fr;">
       <article class="card">
         <details>
-          <summary><strong>Do you use harsh chemicals?</strong></summary>
-          <p>No. We clean with high-temperature steam—no harsh chemical residue on your cooking surfaces.</p>
+          <summary><strong>What is the process?</strong></summary>
+          <p>We arrive at the scheduled time, protect surrounding surfaces, and clean your grill in its current location using high-temperature steam.</p>
         </details>
       </article>
 
       <article class="card">
         <details>
-          <summary><strong>Do you come to me?</strong></summary>
-          <p>Yep. We’re a mobile service covering Greater Tampa Bay (Tampa, St. Pete, Clearwater, Brandon, Wesley Chapel &amp; nearby).</p>
+          <summary><strong>What areas do you serve?</strong></summary>
+          <p>Greater Tampa Bay, including St. Petersburg and Clearwater.</p>
         </details>
       </article>
 
       <article class="card">
         <details>
-          <summary><strong>How do I get a price?</strong></summary>
-          <p>Hit <a href="index.html#quote">Get a Quote</a> and add a few photos—most quotes are same-day.</p>
+          <summary><strong>How long does BBQ grill cleaning take?</strong></summary>
+          <p>Typically 1.5 to 2 hours, depending on the grill’s condition and size.</p>
+        </details>
+      </article>
+
+      <article class="card">
+        <details>
+          <summary><strong>What do I need to do before cleaning?</strong></summary>
+          <p>Please make sure the grill is in working order and that we have access to your outdoor living space, a water faucet, and an electrical outlet.</p>
+        </details>
+      </article>
+
+      <article class="card">
+        <details>
+          <summary><strong>Do I need to be home?</strong></summary>
+          <p>No, you don’t have to be home. We’ll just need to agree on payment arrangements prior to the appointment.</p>
         </details>
       </article>
     </div>
-
-    <p style="margin-top:18px">Full FAQ coming soon:</p>
-    <img src="assets/img/under-construction.jpg" alt="Under construction"
-         style="max-width:680px;width:100%;border-radius:14px;border:1px solid rgba(255,209,102,.25);box-shadow:0 10px 30px rgba(0,0,0,.35)">
   </main>
 
   <!-- Footer -->
@@ -100,7 +107,61 @@
     <small>© <span id="year"></span> GrillShine. All rights reserved.</small>
   </footer>
 
-  <!-- Shared drawer/smooth-scroll script (v=14 includes robust Home handling + focus trap) -->
+  <!-- Shared drawer/smooth-scroll script -->
   <script src="assets/script.js?v=14"></script>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+  <!-- FAQPage structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the process?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "We arrive at the scheduled time, protect surrounding surfaces, and clean your grill in its current location using high-temperature steam."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What areas do you serve?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Greater Tampa Bay, including St. Petersburg and Clearwater."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does BBQ grill cleaning take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Typically 1.5 to 2 hours, depending on the grill’s condition and size."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What do I need to do before cleaning?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Please make sure the grill is in working order and that we have access to your outdoor living space, a water faucet, and an electrical outlet."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to be home?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, you don’t have to be home. We’ll just need to agree on payment arrangements prior to the appointment."
+        }
+      }
+    ]
+  }
+  </script>
 </body>
 </html>
+
